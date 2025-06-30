@@ -1,0 +1,45 @@
+configuration details:
+
+number of layers is 4
+frequency is  4.73605778830964E+14 Hz
+radial frequency is  2.97575287094605E+15 rad/s
+free-space wavelength is  6.33000000000000E-07 m
+free-space wave constant is  9.92604313930423E+06 rad/m
+
+layers details:
+
+layer 0:
+range from  5.00000000000000E-07 m to  1.00000000000000E-06 m
+thickness is  5.00000000000000E-07 m
+magnetic constant is  1.00000000000000E+00 -j -0.00000000000000E+00
+electric constant is  1.00000000000000E+00 -j -0.00000000000000E+00
+intrinsic impedance is  3.76730313412000E+02 -j  0.00000000000000E+00 ohm
+complex wavelength is  6.33000000000000E-07 -j  0.00000000000000E+00 m
+complex wave constant is  9.92604313930423E+06 -j -0.00000000000000E+00 rad/m
+
+layer 1:
+range from  0.00000000000000E+00 m to  5.00000000000000E-07 m
+thickness is  5.00000000000000E-07 m
+magnetic constant is  1.00000000000000E+00 -j -0.00000000000000E+00
+electric constant is  2.00000000000000E+00 -j -0.00000000000000E+00
+intrinsic impedance is  2.66388559292159E+02 -j  0.00000000000000E+00 ohm
+complex wavelength is  4.47598592491085E-07 -j  0.00000000000000E+00 m
+complex wave constant is  1.40375448283045E+07 -j -0.00000000000000E+00 rad/m
+
+layer 2:
+range from -5.00000000000000E-07 m to  0.00000000000000E+00 m
+thickness is  5.00000000000000E-07 m
+magnetic constant is  1.00000000000000E+00 -j -0.00000000000000E+00
+electric constant is  1.00000000000000E+01 -j -0.00000000000000E+00
+intrinsic impedance is  1.19132585401100E+02 -j  0.00000000000000E+00 ohm
+complex wavelength is  2.00172175888658E-07 -j  0.00000000000000E+00 m
+complex wave constant is  3.13889044732894E+07 -j -0.00000000000000E+00 rad/m
+
+layer 3:
+range from -1.00000000000000E-06 m to -5.00000000000000E-07 m
+thickness is  5.00000000000000E-07 m
+magnetic constant is  1.00000000000000E+00 -j -0.00000000000000E+00
+electric constant is  1.00000000000000E+00 -j -0.00000000000000E+00
+intrinsic impedance is  3.76730313412000E+02 -j  0.00000000000000E+00 ohm
+complex wavelength is  6.33000000000000E-07 -j  0.00000000000000E+00 m
+complex wave constant is  9.92604313930423E+06 -j -0.00000000000000E+00 rad/m
