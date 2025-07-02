@@ -154,7 +154,7 @@ void test_transmission_line(){
     FILE *file_y=fopen("data/tests/data_y.txt", "w"); assert(file_y!=null);
     FILE *file_r=fopen("data/tests/data_sqrt_r.txt", "w"); assert(file_r!=null);
     FILE *file_i=fopen("data/tests/data_sqrt_i.txt", "w"); assert(file_i!=null);
-    const size_t sheet=0;
+    const sheet_t sheet=sheet_I;
     const complex_t k=2.0-_1j*0.5;
     for (size_t i=0; i<Ns; i++){
         x = linspace(-range, +range, Ns, i);
