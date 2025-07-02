@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "basic_definitions.h": "c"
+        "basic_definitions.h": "c",
+        "random": "c"
     }
 }
