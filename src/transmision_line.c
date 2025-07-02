@@ -75,3 +75,32 @@ TL_parameters_t basic_reflection_TL(const complex_t k_rho, config_t *config, con
 	parameters.tau_ij_h = 1.0+parameters.Gamma_ij_h;
 	return parameters;
 }
+
+// TL_parameters_t reclection_TL(const complex_t k_rho, config_t *config, const size_t m, const size_t n, 
+// 	const sheet_t sheet){
+// 	TL_parameters_t parameters;
+// 	const size_t N=config->N;
+// 	complex_t Gamma_e, Gamma_h;
+// 	if (m==n){
+
+// 	}
+// 	if (n>m){
+// 		Gamma_e = config->gamma_d;
+// 		Gamma_h = config->gamma_d;
+// 		for (size_t k=N-2; k>m; k--){
+// 			parameters = basic_reflection_TL(k_rho, config, k+1, k, sheet);
+// 			complex_t A, B, C, D;
+			
+// 			A = parameters.Gamma_ij_e;
+// 			B = Gamma_e*cexp(-_1j*)spectral_components(const complex_t k_rho, config_t *config, 
+// 	const size_t n, const sheet_t sheet)
+// 		}
+// 	}
+// 	if (n<m){
+
+// 	}
+// 	// basic_reflection_TL(k_rho, config, m, n, sheet);
+	
+// 	return parameters;
+// }
+

@@ -13,6 +13,7 @@ typedef struct TL_parameters_t{
     complex_t Gamma_ij_e, Gamma_ij_h;
     complex_t tau_ij_e, tau_ij_h;
     complex_t Omega_ij_e, Omega_ij_h;
+    complex_t Gamma_e, Gamma_h;
 }TL_parameters_t;
 
 // Functions
