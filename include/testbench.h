@@ -8,6 +8,8 @@
 #include "bessel.h"
 #include "quad.h"
 #include "transmission_line.h"
+//
+#include "testbench_gold_Kretschmann.h"
 
 // definitions
 

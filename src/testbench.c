@@ -125,7 +125,41 @@ void test_quad(){
 
 void test_transmission_line(){
 
-    const size_t N_layers=4;
+    // const real_t range=4.0;
+    // const size_t Ns=100+1;
+    // real_t x, y;
+    // complex_t z, ans;
+
+    // FILE *file_x=fopen("data/tests/data_x.txt", "w"); assert(file_x!=null);
+    // FILE *file_y=fopen("data/tests/data_y.txt", "w"); assert(file_y!=null);
+    // FILE *file_r=fopen("data/tests/data_sqrt_r.txt", "w"); assert(file_r!=null);
+    // FILE *file_i=fopen("data/tests/data_sqrt_i.txt", "w"); assert(file_i!=null);
+    // const sheet_t sheet=sheet_I;
+    // const complex_t k=2.0-_1j*0.5;
+    // for (size_t i=0; i<Ns; i++){
+    //     x = linspace(-range, +range, Ns, i);
+    //     for (size_t j=0; j<Ns; j++){    
+    //         y = linspace(-range, +range, Ns, j);
+    //         fprintf(file_x, "%21.14E ", x);
+    //         fprintf(file_y, "%21.14E ", y);
+    //         z = x+_1j*y;
+    //         ans = sqrt_Riemann(k*k-z*z, sheet);
+    //         fprintf(file_r, "%21.14E ", cabs(ans));
+    //         fprintf(file_i, "%21.14E ", carg(ans));
+    //     }
+    //     fprintf(file_x, "\n");
+    //     fprintf(file_y, "\n");
+    //     fprintf(file_r, "\n");
+    //     fprintf(file_i, "\n");
+    // }
+    // fclose(file_x);
+    // fclose(file_y);
+    // fclose(file_r);
+    // fclose(file_i);
+
+    //
+
+    const size_t N_layers=3;
     const real_t lamda=633.0*_nm;
     const real_t freq=_c_0/lamda;
 
@@ -133,48 +167,11 @@ void test_transmission_line(){
     init_config_t(&config, N_layers, 0.0, 0.0, freq);
 
     size_t n=0;
-    set_layer_config_t(&config, n++, 1.0-_1j*0.0, 1.0-_1j*0.0, +500.0*_nm, +1000.0*_nm);
-    set_layer_config_t(&config, n++, 1.0-_1j*0.0, 2.0-_1j*0.0, +0.0*_nm, +500.0*_nm);
-    set_layer_config_t(&config, n++, 1.0-_1j*0.0, 10.0-_1j*0.0, -500.0*_nm, +0.0*_nm);
-    set_layer_config_t(&config, n++, 1.0-_1j*0.0, 1.0-_1j*0.0, -1000.0*_nm, -500.0*_nm);
+    set_layer_config_t(&config, n++, 1.0-_1j*0.0, 2.3103-_1j*0.0, +0.0*_nm, +2000.0*_nm);
+    set_layer_config_t(&config, n++, 1.0-_1j*0.0, -11.753-_1j*1.2596, -50.0*_nm, +0.0*_nm);
+    set_layer_config_t(&config, n++, 1.0-_1j*0.0, 1.0-_1j*0.0, -2000.0*_nm, -50.0*_nm);
     check_config_t(&config);
-
     print_config_t(&config);
-
     clear_config_t(&config);
-
-    //
-
-    const real_t range=4.0;
-    const size_t Ns=100+1;
-    real_t x, y;
-    complex_t z, ans;
-
-    FILE *file_x=fopen("data/tests/data_x.txt", "w"); assert(file_x!=null);
-    FILE *file_y=fopen("data/tests/data_y.txt", "w"); assert(file_y!=null);
-    FILE *file_r=fopen("data/tests/data_sqrt_r.txt", "w"); assert(file_r!=null);
-    FILE *file_i=fopen("data/tests/data_sqrt_i.txt", "w"); assert(file_i!=null);
-    const sheet_t sheet=sheet_I;
-    const complex_t k=2.0-_1j*0.5;
-    for (size_t i=0; i<Ns; i++){
-        x = linspace(-range, +range, Ns, i);
-        for (size_t j=0; j<Ns; j++){    
-            y = linspace(-range, +range, Ns, j);
-            fprintf(file_x, "%21.14E ", x);
-            fprintf(file_y, "%21.14E ", y);
-            z = x+_1j*y;
-            ans = sqrt_Riemann(k*k-z*z, sheet);
-            fprintf(file_r, "%21.14E ", cabs(ans));
-            fprintf(file_i, "%21.14E ", carg(ans));
-        }
-        fprintf(file_x, "\n");
-        fprintf(file_y, "\n");
-        fprintf(file_r, "\n");
-        fprintf(file_i, "\n");
-    }
-    fclose(file_x);
-    fclose(file_y);
-    fclose(file_r);
-    fclose(file_i);
 
 }

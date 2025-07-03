@@ -17,15 +17,15 @@ void init_layer_t(layer_t *layer, const complex_t mu, const complex_t eps,
 }
 
 
-void init_config_t(config_t *config, const size_t N, const complex_t gamma_u, const complex_t gamma_d, 
+void init_config_t(config_t *config, const size_t N, const complex_t Gamma_u, const complex_t Gamma_d, 
     const real_t freq){
     assert(config!=null);
     clear_config_t(config);
     assert_error(N>0, "invalid number of layers");
     assert_error(freq>0, "invalid operating frequency");
     config->N = N;
-    config->gamma_d = gamma_d;
-    config->gamma_u = gamma_u;
+    config->Gamma_d = Gamma_d;
+    config->Gamma_u = Gamma_u;
     config->freq = freq;
     config->omega = 2.0*_pi*freq;
     config->lambda_0 = _c_0/freq;
@@ -39,8 +39,8 @@ void clear_config_t(config_t *config){
     assert(config!=null);
     config->freq = 0.0;
     config->omega = 0.0;
-    config->gamma_d = 0.0;
-    config->gamma_u = 0.0;
+    config->Gamma_d = 0.0;
+    config->Gamma_u = 0.0;
     config->k_0 = 0.0;
     config->lambda_0 = 0.0;
     config->N = 0;
@@ -91,11 +91,11 @@ void print_config_t(config_t *config){
         fprintf(file, "\nlayer %zu:\n", n);
         fprintf(file, "range from %21.14E m to %21.14E m\n", config->layers[n].z_d, config->layers[n].z_u);
         fprintf(file, "thickness is %21.14E m\n", config->layers[n].d);
-        fprintf(file, "magnetic constant is %21.14E -j %21.14E\n", creal(config->layers[n].mu), cimag(config->layers[n].mu));
-        fprintf(file, "electric constant is %21.14E -j %21.14E\n", creal(config->layers[n].eps), cimag(config->layers[n].eps));
-        fprintf(file, "intrinsic impedance is %21.14E -j %21.14E ohm\n", creal(config->layers[n].eta), cimag(config->layers[n].eta));
-        fprintf(file, "complex wavelength is %21.14E -j %21.14E m\n", creal(config->layers[n].lambda), cimag(config->layers[n].lambda));
-        fprintf(file, "complex wave constant is %21.14E -j %21.14E rad/m\n", creal(config->layers[n].k), cimag(config->layers[n].k));
+        fprintf(file, "magnetic constant is %21.14E +j %21.14E\n", creal(config->layers[n].mu), cimag(config->layers[n].mu));
+        fprintf(file, "electric constant is %21.14E +j %21.14E\n", creal(config->layers[n].eps), cimag(config->layers[n].eps));
+        fprintf(file, "intrinsic impedance is %21.14E +j %21.14E ohm\n", creal(config->layers[n].eta), cimag(config->layers[n].eta));
+        fprintf(file, "complex wavelength is %21.14E +j %21.14E m\n", creal(config->layers[n].lambda), cimag(config->layers[n].lambda));
+        fprintf(file, "complex wave constant is %21.14E +j %21.14E rad/m\n", creal(config->layers[n].k), cimag(config->layers[n].k));
     }
     fclose(file);
 }

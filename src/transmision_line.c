@@ -22,7 +22,7 @@ spectral_parameters_t spectral_components(const complex_t k_rho, config_t *confi
 	const real_t omega=config->omega;
 	const complex_t mu=config->layers[n].mu; 
 	const complex_t eps=config->layers[n].eps;
-	complex_t k_z=0.0;
+	complex_t k_z=sqrt_Riemann(k*k-k_rho*k_rho, sheet_I);
 	if (sheet==sheet_I){
 		if (n==0){
 			k_z = sqrt_Riemann(k*k-k_rho*k_rho, sheet_I);
@@ -54,9 +54,7 @@ spectral_parameters_t spectral_components(const complex_t k_rho, config_t *confi
 		if (n==(N-1)){
 			k_z = sqrt_Riemann(k*k-k_rho*k_rho, sheet_II);
 		}
-	}else{
-		k_z = sqrt_Riemann(k*k-k_rho*k_rho, sheet_I);
-	} 
+	}
 	spectral.k_z = k_z;
 	spectral.Theta = k_z*d;
 	spectral.Z_e = k_z/(omega*_eps_0*eps);
@@ -64,43 +62,87 @@ spectral_parameters_t spectral_components(const complex_t k_rho, config_t *confi
 	return spectral;
 }
 
-TL_parameters_t basic_reflection_TL(const complex_t k_rho, config_t *config, const size_t i, const size_t j, 
-	const sheet_t sheet){
-	TL_parameters_t parameters; 
-	spectral_parameters_t para_i=spectral_components(k_rho, config, i, sheet);
-	spectral_parameters_t para_j=spectral_components(k_rho, config, j, sheet);
-	parameters.Gamma_ij_e = (para_i.Z_e-para_j.Z_e)/(para_i.Z_e+para_j.Z_e);
-	parameters.Gamma_ij_h = (para_i.Z_h-para_j.Z_h)/(para_i.Z_h+para_j.Z_h);
-	parameters.tau_ij_e = 1.0+parameters.Gamma_ij_e;
-	parameters.tau_ij_h = 1.0+parameters.Gamma_ij_h;
-	return parameters;
+void Refl(const complex_t k_rho, config_t *config, const size_t n, const sheet_t sheet, 
+	complex_t *Gamma_e_u, complex_t *Gamma_h_u, complex_t *Gamma_e_d, complex_t *Gamma_h_d){
+	spectral_parameters_t para_m, para_n;
+	complex_t Gamma_mn;
+	complex_t A, B;
+	// Up
+	(*Gamma_e_u) = config->Gamma_u;
+	(*Gamma_h_u) = config->Gamma_u;
+	for (size_t i=1; i<=n; i++){
+		para_m = spectral_components(k_rho, config, i-1, sheet);
+		para_n = spectral_components(k_rho, config, i, sheet);
+		// e-mode
+		Gamma_mn = (para_m.Z_e-para_n.Z_e)/(para_m.Z_e+para_n.Z_e);
+		A = Gamma_mn+(*Gamma_e_u)*cexp(-_1j*2.0*para_m.Theta);
+		B = 1.0+Gamma_mn*(*Gamma_e_u)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_e_u) = A/B;
+		// h-mode
+		Gamma_mn = (para_m.Z_h-para_n.Z_h)/(para_m.Z_h+para_n.Z_h);
+		A = Gamma_mn+(*Gamma_h_u)*cexp(-_1j*2.0*para_m.Theta);
+		B = 1.0+Gamma_mn*(*Gamma_h_u)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_h_u) = A/B;
+	}
+	// Down
+	(*Gamma_e_d) = config->Gamma_d;
+	(*Gamma_h_d) = config->Gamma_d;
+	for (int_t i=config->N-2; i>=(int_t)n; i--){
+		para_m = spectral_components(k_rho, config, (size_t)i+1, sheet);
+		para_n = spectral_components(k_rho, config, (size_t)i, sheet);
+		// e-mode
+		Gamma_mn = (para_m.Z_e-para_n.Z_e)/(para_m.Z_e+para_n.Z_e);
+		A = Gamma_mn+(*Gamma_e_d)*cexp(-_1j*2.0*para_m.Theta);
+		B = 1.0+Gamma_mn*(*Gamma_e_d)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_e_d) = A/B;
+		// h-mode
+		Gamma_mn = (para_m.Z_h-para_n.Z_h)/(para_m.Z_h+para_n.Z_h);
+		A = Gamma_mn+(*Gamma_h_d)*cexp(-_1j*2.0*para_m.Theta);
+		B = 1.0+Gamma_mn*(*Gamma_h_d)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_h_d) = A/B;
+	}
 }
 
-// TL_parameters_t reclection_TL(const complex_t k_rho, config_t *config, const size_t m, const size_t n, 
-// 	const sheet_t sheet){
-// 	TL_parameters_t parameters;
-// 	const size_t N=config->N;
-// 	complex_t Gamma_e, Gamma_h;
-// 	if (m==n){
-
-// 	}
-// 	if (n>m){
-// 		Gamma_e = config->gamma_d;
-// 		Gamma_h = config->gamma_d;
-// 		for (size_t k=N-2; k>m; k--){
-// 			parameters = basic_reflection_TL(k_rho, config, k+1, k, sheet);
-// 			complex_t A, B, C, D;
-			
-// 			A = parameters.Gamma_ij_e;
-// 			B = Gamma_e*cexp(-_1j*)spectral_components(const complex_t k_rho, config_t *config, 
-// 	const size_t n, const sheet_t sheet)
-// 		}
-// 	}
-// 	if (n<m){
-
-// 	}
-// 	// basic_reflection_TL(k_rho, config, m, n, sheet);
-	
-// 	return parameters;
-// }
+void tau(const complex_t k_rho, config_t *config, const size_t n, const sheet_t sheet, 
+	const complex_t V_m_e, const complex_t V_m_h, 
+	complex_t *V_e_u, complex_t *V_h_u, complex_t *V_e_d, complex_t *V_h_d){
+	spectral_parameters_t para_m, para_n;
+	complex_t Gamma_m_e, Gamma_m_h, Gamma_n_e, Gamma_n_h;
+	complex_t dummy_1, dummy_2;
+	complex_t A, B;
+	// Up
+	(*V_e_u) = config->Gamma_u;
+	(*V_h_u) = config->Gamma_u;
+	for (int_t i=config->N-2; i>=(int_t)n; i--){
+		para_m = spectral_components(k_rho, config, (size_t)i+1, sheet);
+		para_n = spectral_components(k_rho, config, (size_t)i, sheet);
+		// e-mode
+		Refl(k_rho, config, (size_t)i+1, sheet, &Gamma_m_e, &Gamma_m_h, &dummy_1, &dummy_2);
+		A = (1.0+Gamma_m_e)*cexp(-_1j*para_m.Theta)/(1.0+cexp(-_1j*2.0*para_m.Theta));
+		B = 1.0+Gamma_mn*(*Gamma_e_u)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_e_u) = A/B;
+		// h-mode
+		Gamma_mn = (para_m.Z_h-para_n.Z_h)/(para_m.Z_h+para_n.Z_h);
+		A = Gamma_mn+(*Gamma_h_u)*cexp(-_1j*2.0*para_m.Theta);
+		B = 1.0+Gamma_mn*(*Gamma_h_u)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_h_u) = A/B;
+	}
+	// Down
+	(*V_e_d) = config->Gamma_d;
+	(*V_h_d) = config->Gamma_d;
+	for (int_t i=config->N-2; i>=(int_t)n; i--){
+		para_m = spectral_components(k_rho, config, (size_t)i+1, sheet);
+		para_n = spectral_components(k_rho, config, (size_t)i, sheet);
+		// e-mode
+		Gamma_mn = (para_m.Z_e-para_n.Z_e)/(para_m.Z_e+para_n.Z_e);
+		A = Gamma_mn+(*Gamma_e_d)*cexp(-_1j*2.0*para_m.Theta);
+		B = 1.0+Gamma_mn*(*Gamma_e_d)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_e_d) = A/B;
+		// h-mode
+		Gamma_mn = (para_m.Z_h-para_n.Z_h)/(para_m.Z_h+para_n.Z_h);
+		A = Gamma_mn+(*Gamma_h_d)*cexp(-_1j*2.0*para_m.Theta);
+		B = 1.0+Gamma_mn*(*Gamma_h_d)*cexp(-_1j*2.0*para_m.Theta);
+		(*Gamma_h_d) = A/B;
+	}
+}
 

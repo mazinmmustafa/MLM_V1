@@ -34,7 +34,6 @@ complex_t quadL(complex_t func(complex_t, void*), const real_t a, const real_t b
 		I_1 = quadL(func, a, m, args, x_quad, w_quad, N, tol, k_max, flag, I_1, ++k);
 		I_2 = quadL(func, m, b, args, x_quad, w_quad, N, tol, k_max, flag, I_2, ++k);
 		I_n = I_1+I_2;
-		// printf("%zu: %21.14E, %21.14E\n", k, creal(I_n), cimag(I_n));
 		return I_n;
 	}else{
 		if (k>=k_max){(*flag) = true;}

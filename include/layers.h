@@ -13,7 +13,7 @@ typedef struct layer_t{
 
 typedef struct config_t{
     size_t N;
-    complex_t gamma_u, gamma_d;
+    complex_t Gamma_u, Gamma_d;
     real_t freq, omega;
     layer_t *layers;
     size_t is_allocated;
