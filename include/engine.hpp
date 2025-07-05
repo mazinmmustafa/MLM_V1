@@ -12,8 +12,7 @@
 class configuration_t{
     private:
         size_t N=1;
-        real_t freq=0.0, omega=0.0;
-
+        real_t freq=0.0, omega=0.0, k_0=0.0; 
     public:
         configuration_t(){}
         ~configuration_t(){}
