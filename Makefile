@@ -91,7 +91,7 @@ clean:
 	@$(RM) -rv $(BDIR)/$(EXE) $(ODIR)/*.o $(DDIR)/*.d
 
 clean_all: clean 
-	@$(RM) -rv $(BDIR) $(ODIR) $(DDIR) .vscode data/*
+	@$(RM) -rv $(BDIR) $(ODIR) $(DDIR) .vscode 
 
 clean_data:
 	@find ./data/ -type f -name '*.pos' | xargs $(RM) -rv
