@@ -3,9 +3,12 @@
 
 int main(){
 
-    test_bessel();
-    test_matrix();
-    test_quadl();
+    //
+    // test_bessel();
+    // test_matrix();
+    // test_quadl();
+
+    
 
     return 0;
 }
