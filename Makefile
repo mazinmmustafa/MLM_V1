@@ -109,7 +109,7 @@ valgrind: build
 git_push: clean_all clean_data
 	git add .
 	git commit -m 'update' 
-	git push --force --set-upstream $(GIT_URL)
+	git push --force --set-upstream $(GIT_URL) master
 
 git_pull: clean_all
 	git pull $(GIT_URL)
