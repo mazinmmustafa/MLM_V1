@@ -1,5 +1,5 @@
-#ifndef __VECTOR_HPP__
-#define __VECTOR_HPP__
+#ifndef __ENGINE_HPP__
+#define __ENGINE_HPP__
 
 // Libraries
 #include "basic_definitions.hpp"
@@ -11,6 +11,9 @@
 // Definitions
 class configuration_t{
     private:
+        size_t N=1;
+        real_t freq=0.0, omega=0.0;
+
     public:
         configuration_t(){}
         ~configuration_t(){}

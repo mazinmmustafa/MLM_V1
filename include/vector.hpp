@@ -1,5 +1,5 @@
-#ifndef __ENGINE_HPP__
-#define __ENGINE_HPP__
+#ifndef __VECTOR_HPP__
+#define __VECTOR_HPP__
 
 // Libraries
 #include "basic_definitions.hpp"
