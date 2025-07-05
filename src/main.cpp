@@ -8,7 +8,5 @@ int main(){
     // test_matrix();
     // test_quadl();
 
-    
-
     return 0;
 }
