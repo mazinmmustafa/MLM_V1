@@ -27,6 +27,70 @@ struct Gamma_t{
     complex_t Gamma_e=0.0, Gamma_h=0.0;
 };
 
+struct tau_t{
+    complex_t tau_e=0.0, tau_h=0.0;
+};
+
+struct TLGF_t{
+    complex_t V_e=0.0, I_e=0.0;
+    complex_t V_h=0.0, I_h=0.0;
+};
+
+enum source_t{v_source, i_source};
+
+struct Greens_functions_t{
+    complex_t xx=0.0, xy=0.0, xz=0.0;
+    complex_t yx=0.0, yy=0.0, yz=0.0;
+    complex_t zx=0.0, zy=0.0, zz=0.0;
+};
+
+struct position_t{
+    real_t x=0.0, y=0.0, z=0.0, rho=0.0, phi=0.0, r=0.0, theta=0.0;
+};
+
+struct cartesian_t:position_t{
+    cartesian_t(const real_t x, const real_t y, const real_t z){
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        //
+        this->r = sqrt(x*x+y*y+z*z);
+        this->rho = sqrt(x*x+y*y);
+        this->phi = atan2(y, x);
+        this->theta = acos(z/r);
+    }
+};   
+
+struct cylindrical_t:position_t{
+    cylindrical_t(const real_t rho, const real_t phi, const real_t z){
+        this->rho = rho;
+        this->phi = phi;
+        this->z = z;
+        //
+        this->x = rho*cos(phi);
+        this->y = rho*sin(phi);
+        this->r = sqrt(rho*rho+z*z);
+        this->theta = acos(z/r);
+    }
+};   
+
+struct spherical_t:position_t{
+    spherical_t(const real_t r, const real_t theta, const real_t phi){
+        this->r = r;
+        this->theta = theta;
+        this->phi = phi;
+        //
+        this->x = r*sin(theta)*cos(phi);
+        this->y = r*sin(theta)*sin(phi);
+        this->r = r*cos(theta);
+        this->rho = r*sin(theta);
+    }
+};  
+
+struct integrand_args{
+    position_t r, r_;
+};
+
 class configuration_t{
     private:
         
@@ -36,7 +100,8 @@ class configuration_t{
         complex_t Gamma_u=0.0, Gamma_d=0.0;
         size_t is_allocated=false;
         layer_t *layers=null;
-
+        real_t k_min=+1.0;
+        //
         configuration_t();
         ~configuration_t();
         void set(const size_t N, const real_t freq);
@@ -48,6 +113,26 @@ class configuration_t{
         k_rho_paramters_t get_k_rho_parameters(const complex_t k_rho, const size_t n, const sheet_t sheet);
         Gamma_t refl_u(const complex_t k_rho, const size_t n, const sheet_t sheet);
         Gamma_t refl_d(const complex_t k_rho, const size_t n, const sheet_t sheet);
+        tau_t tau_u(const complex_t k_rho, const complex_t V_m_e, const complex_t V_n_e,
+            const size_t m, const size_t n, const sheet_t sheet);
+        tau_t tau_d(const complex_t k_rho, const complex_t V_m_e, const complex_t V_n_e,
+            const size_t m, const size_t n, const sheet_t sheet);
+        size_t find_layer(const real_t z);
+        TLGF_t TLGF_r(const complex_t k_rho, const real_t z, const real_t z_, const source_t source, const sheet_t sheet);
+        TLGF_t TLGF(const complex_t k_rho, const real_t z, const real_t z_, const source_t source, const sheet_t sheet);
+        complex_t detour(complex_t &k_rho, const real_t rho, const real_t distance);
+        complex_t hankel_transform(complex_t func(complex_t, void*), void *args, quadl_t quadl);
+        // EJ
+        Greens_functions_t G_EJ_0(const position_t r, const position_t r_);
+        complex_t G_EJ_xx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_xy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_xz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_yx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_yy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_yz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_zx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_zy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EJ_zz(const position_t r, const position_t r_, quadl_t quadl);
 };
 
 // Functions

@@ -28,6 +28,8 @@
 #define real_t double
 #define complex_t std::complex<real_t>
 
+#undef I
+
 // constants
 
 // math

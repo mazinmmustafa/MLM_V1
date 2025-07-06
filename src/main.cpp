@@ -9,7 +9,10 @@ int main(){
     // test_matrix();
     // test_quadl();
 
-    test_configuration();
+    // test_configuration();
+    // test_TLGFs();
+    // test_integrands();
+    test_DGFs_Paulus();
 
     return 0;
 }
