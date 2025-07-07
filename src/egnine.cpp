@@ -542,6 +542,94 @@ Greens_functions_t configuration_t::G_EJ_0(const position_t r, const position_t 
     return DGF;
 }
 
+Greens_functions_t configuration_t::G_HM_0(const position_t r, const position_t r_){
+    Greens_functions_t DGF;
+    const size_t n=configuration_t::find_layer(r_.z);
+    const complex_t k=this->layers[n].k;
+    const complex_t eps=this->layers[n].eps;
+    const real_t omega=this->omega;
+    const real_t R=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y)+(r.z-r_.z)*(r.z-r_.z));
+    const complex_t j=complex_t(0.0, 1.0);
+    const complex_t g=exp(-j*k*R)/(4.0*pi*R);
+    const complex_t g1=-(1.0+j*k*R)*g/R;
+    const complex_t g2=-(1.0+j*k*R)*g1/R+g/(R*R);
+    const complex_t factor=-j*omega*eps_0*eps;
+    //
+    if (R==0.0){
+        DGF.xx = factor*(-1.0/(3.0*k*k));
+        DGF.yy = factor*(-1.0/(3.0*k*k));
+        DGF.zz = factor*(-1.0/(3.0*k*k));
+        DGF.xy = DGF.xz = DGF.yx = DGF.yz = DGF.zx = DGF.zy = 0.0;
+    }else{
+        DGF.xx = factor*(g+(1.0/(k*k))*(g1/R+((r.x-r_.x)/R)*((r.x-r_.x)/R)*(g2-g1/R)));
+        DGF.xy = factor*((1.0/(k*k))*(((r.x-r_.x)/R)*((r.y-r_.y)/R)*(g2-g1/R)));
+        DGF.xz = factor*((1.0/(k*k))*(((r.x-r_.x)/R)*((r.z-r_.z)/R)*(g2-g1/R)));
+        DGF.yx = factor*((1.0/(k*k))*(((r.y-r_.y)/R)*((r.x-r_.x)/R)*(g2-g1/R)));
+        DGF.yy = factor*(g+(1.0/(k*k))*(g1/R+((r.y-r_.y)/R)*((r.y-r_.y)/R)*(g2-g1/R)));
+        DGF.yz = factor*((1.0/(k*k))*(((r.y-r_.y)/R)*((r.z-r_.z)/R)*(g2-g1/R)));
+        DGF.zx = factor*((1.0/(k*k))*(((r.z-r_.z)/R)*((r.x-r_.x)/R)*(g2-g1/R)));
+        DGF.zy = factor*((1.0/(k*k))*(((r.z-r_.z)/R)*(((r.y-r_.y)-r_.y)/R)*(g2-g1/R)));
+        DGF.zz = factor*(g+(1.0/(k*k))*(g1/R+((r.z-r_.z)/R)*((r.z-r_.z)/R)*(g2-g1/R)));
+    }
+    return DGF;
+}
+
+Greens_functions_t configuration_t::G_HJ_0(const position_t r, const position_t r_){
+    Greens_functions_t DGF;
+    const size_t n=configuration_t::find_layer(r_.z);
+    const complex_t k=this->layers[n].k;
+    const real_t R=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y)+(r.z-r_.z)*(r.z-r_.z));
+    const complex_t j=complex_t(0.0, 1.0);
+    const complex_t g=exp(-j*k*R)/(4.0*pi*R);
+    const complex_t g1=-(1.0+j*k*R)*g/R;
+    //
+    if (R==0.0){
+        DGF.xx = 0.0;
+        DGF.yy = 0.0;
+        DGF.zz = 0.0;
+        DGF.xy = DGF.xz = DGF.yx = DGF.yz = DGF.zx = DGF.zy = 0.0;
+    }else{
+        DGF.xx = 0.0;
+        DGF.xy = -((r.z-r_.z)/R)*g1;
+        DGF.xz = +((r.y-r_.y)/R)*g1;
+        DGF.yx = +((r.z-r_.z)/R)*g1;
+        DGF.yy = 0.0;
+        DGF.yz = -((r.x-r_.x)/R)*g1;
+        DGF.zx = -((r.y-r_.y)/R)*g1;
+        DGF.zy = +((r.x-r_.x)/R)*g1;
+        DGF.zz = 0.0;
+    }
+    return DGF;
+}
+
+Greens_functions_t configuration_t::G_EM_0(const position_t r, const position_t r_){
+    Greens_functions_t DGF;
+    const size_t n=configuration_t::find_layer(r_.z);
+    const complex_t k=this->layers[n].k;
+    const real_t R=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y)+(r.z-r_.z)*(r.z-r_.z));
+    const complex_t j=complex_t(0.0, 1.0);
+    const complex_t g=exp(-j*k*R)/(4.0*pi*R);
+    const complex_t g1=-(1.0+j*k*R)*g/R;
+    //
+    if (R==0.0){
+        DGF.xx = 0.0;
+        DGF.yy = 0.0;
+        DGF.zz = 0.0;
+        DGF.xy = DGF.xz = DGF.yx = DGF.yz = DGF.zx = DGF.zy = 0.0;
+    }else{
+        DGF.xx = 0.0;
+        DGF.xy = +((r.z-r_.z)/R)*g1;
+        DGF.xz = -((r.y-r_.y)/R)*g1;
+        DGF.yx = -((r.z-r_.z)/R)*g1;
+        DGF.yy = 0.0;
+        DGF.yz = +((r.x-r_.x)/R)*g1;
+        DGF.zx = +((r.y-r_.y)/R)*g1;
+        DGF.zy = -((r.x-r_.x)/R)*g1;
+        DGF.zz = 0.0;
+    }
+    return DGF;
+}
+
 //
 
 struct integrand_args_t{
@@ -555,6 +643,8 @@ complex_t configuration_t::hankel_transform(complex_t func(complex_t, void*), vo
     if (flag==true){print("no convergence!\n");}
     return ans/lambda_0;
 }
+
+// EJ
 
 complex_t G_EJ_1(const complex_t k_rho, void *args_){
     integrand_args_t *args=(integrand_args_t*)args_;
@@ -761,4 +851,625 @@ complex_t configuration_t::G_EJ_zz(const position_t r, const position_t r_, quad
         I_ = I_+DGF.zz;
     }
     return I_;
+}
+
+near_field_t configuration_t::compute_E_J_near_field(const position_t r, const dipole_t dipole_J, 
+    quadl_t quadl){
+    near_field_t E;
+    E.x = this->G_EJ_xx(r, dipole_J.r, quadl)*dipole_J.x+this->G_EJ_xy(r, dipole_J.r, quadl)*dipole_J.y+this->G_EJ_xz(r, dipole_J.r, quadl)*dipole_J.z;
+    E.y = this->G_EJ_yx(r, dipole_J.r, quadl)*dipole_J.x+this->G_EJ_yy(r, dipole_J.r, quadl)*dipole_J.y+this->G_EJ_yz(r, dipole_J.r, quadl)*dipole_J.z;
+    E.z = this->G_EJ_zx(r, dipole_J.r, quadl)*dipole_J.x+this->G_EJ_zy(r, dipole_J.r, quadl)*dipole_J.y+this->G_EJ_zz(r, dipole_J.r, quadl)*dipole_J.z;
+    return E;
+}
+
+// EM
+
+complex_t G_EM_1(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, v_source, sheet_I);
+    return factor*(TLGF.V_e-TLGF.V_h)*besselj(2.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_EM_2(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, v_source, sheet_I);
+    return factor*(TLGF.V_e+TLGF.V_h)*besselj(0.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_EM_3(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, i_source, sheet_I);
+    return factor*(k_rho_*TLGF.V_h)*besselj(1.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_EM_4(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, v_source, sheet_I);
+    return factor*(k_rho_*TLGF.I_e)*besselj(1.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t configuration_t::G_EM_xx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_1_=configuration_t::hankel_transform(G_EM_1, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-0.5*sin(2.0*phi)*G_EM_1_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.xx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_xy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_1_=configuration_t::hankel_transform(G_EM_1, &args, quadl);
+    complex_t G_EM_2_=configuration_t::hankel_transform(G_EM_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-0.5*G_EM_2_;
+    complex_t I_2=+0.5*cos(2.0*phi)*G_EM_1_;
+    complex_t I_=I_1+I_2;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.xy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_yx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_1_=configuration_t::hankel_transform(G_EM_1, &args, quadl);
+    complex_t G_EM_2_=configuration_t::hankel_transform(G_EM_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=+0.5*G_EM_2_;
+    complex_t I_2=+0.5*cos(2.0*phi)*G_EM_1_;
+    complex_t I_=I_1+I_2;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.yx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_yy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_1_=configuration_t::hankel_transform(G_EM_1, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=+0.5*sin(2.0*phi)*G_EM_1_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.yy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_xz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_3_=configuration_t::hankel_transform(G_EM_3, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((1.0)/(j*eta_0*this->k_0*this->layers[m].mu))*sin(phi)*G_EM_3_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.xz;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_yz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_3_=configuration_t::hankel_transform(G_EM_3, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-((1.0)/(j*eta_0*this->k_0*this->layers[m].mu))*cos(phi)*G_EM_3_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.yz;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_zx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_4_=configuration_t::hankel_transform(G_EM_4, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((j*eta_0)/(this->k_0*this->layers[n].eps))*sin(phi)*G_EM_4_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.zx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_zy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_EM_4_=configuration_t::hankel_transform(G_EM_4, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-((j*eta_0)/(this->k_0*this->layers[n].eps))*cos(phi)*G_EM_4_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_EM_0(r, r_);
+        I_ = I_+DGF.zy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_EM_zz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    return 0.0*rho*phi*quadl.N;
+}
+
+near_field_t configuration_t::compute_E_M_near_field(const position_t r, const dipole_t dipole_M, 
+    quadl_t quadl){
+    near_field_t E;
+    E.x = this->G_EM_xx(r, dipole_M.r, quadl)*dipole_M.x+this->G_EM_xy(r, dipole_M.r, quadl)*dipole_M.y+this->G_EM_xz(r, dipole_M.r, quadl)*dipole_M.z;
+    E.y = this->G_EM_yx(r, dipole_M.r, quadl)*dipole_M.x+this->G_EM_yy(r, dipole_M.r, quadl)*dipole_M.y+this->G_EM_yz(r, dipole_M.r, quadl)*dipole_M.z;
+    E.z = this->G_EM_zx(r, dipole_M.r, quadl)*dipole_M.x+this->G_EM_zy(r, dipole_M.r, quadl)*dipole_M.y+this->G_EM_zz(r, dipole_M.r, quadl)*dipole_M.z;
+    return E;
+}
+
+// HM
+
+complex_t G_HM_1(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, v_source, sheet_I);
+    return factor*(TLGF.I_h+TLGF.I_e)*besselj(0.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_HM_2(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, v_source, sheet_I);
+    return factor*(TLGF.I_h-TLGF.I_e)*besselj(2.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_HM_3(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, i_source, sheet_I);
+    return factor*(k_rho_*TLGF.I_h)*besselj(1.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_HM_4(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, v_source, sheet_I);
+    return factor*(k_rho_*TLGF.V_h)*besselj(1.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_HM_5(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, i_source, sheet_I);
+    return factor*(k_rho_*k_rho_*TLGF.V_h)*besselj(0.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t configuration_t::G_HM_xx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_1_=configuration_t::hankel_transform(G_HM_1, &args, quadl);
+    complex_t G_HM_2_=configuration_t::hankel_transform(G_HM_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-0.5*G_HM_1_;
+    complex_t I_2=+0.5*cos(2.0*phi)*G_HM_2_;
+    complex_t I_=I_1+I_2;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.xx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_xy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_2_=configuration_t::hankel_transform(G_HM_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=+0.5*sin(2.0*phi)*G_HM_2_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.xy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_yx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_2_=configuration_t::hankel_transform(G_HM_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=+0.5*sin(2.0*phi)*G_HM_2_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.yx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_yy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_1_=configuration_t::hankel_transform(G_HM_1, &args, quadl);
+    complex_t G_HM_2_=configuration_t::hankel_transform(G_HM_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-0.5*G_HM_1_;
+    complex_t I_2=-0.5*cos(2.0*phi)*G_HM_2_;
+    complex_t I_=I_1+I_2;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.yy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_xz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_3_=configuration_t::hankel_transform(G_HM_3, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((1.0)/(j*eta_0*this->k_0*this->layers[m].mu))*cos(phi)*G_HM_3_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.xz;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_yz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_3_=configuration_t::hankel_transform(G_HM_3, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((1.0)/(j*eta_0*this->k_0*this->layers[m].mu))*sin(phi)*G_HM_3_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.yz;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_zx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_4_=configuration_t::hankel_transform(G_HM_4, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((1.0)/(j*eta_0*this->k_0*this->layers[n].mu))*cos(phi)*G_HM_4_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.zx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_zy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_4_=configuration_t::hankel_transform(G_HM_4, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((1.0)/(j*eta_0*this->k_0*this->layers[n].mu))*sin(phi)*G_HM_4_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.zy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HM_zz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HM_5_=configuration_t::hankel_transform(G_HM_5, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-((1.0)/(eta_0*eta_0*this->k_0*this->k_0*this->layers[m].mu*this->layers[n].mu))*G_HM_5_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HM_0(r, r_);
+        I_ = I_+DGF.zz;
+    }
+    return I_;
+}
+
+near_field_t configuration_t::compute_H_M_near_field(const position_t r, const dipole_t dipole_M, 
+    quadl_t quadl){
+    near_field_t H;
+    H.x = this->G_HM_xx(r, dipole_M.r, quadl)*dipole_M.x+this->G_HM_xy(r, dipole_M.r, quadl)*dipole_M.y+this->G_HM_xz(r, dipole_M.r, quadl)*dipole_M.z;
+    H.y = this->G_HM_yx(r, dipole_M.r, quadl)*dipole_M.x+this->G_HM_yy(r, dipole_M.r, quadl)*dipole_M.y+this->G_HM_yz(r, dipole_M.r, quadl)*dipole_M.z;
+    H.z = this->G_HM_zx(r, dipole_M.r, quadl)*dipole_M.x+this->G_HM_zy(r, dipole_M.r, quadl)*dipole_M.y+this->G_HM_zz(r, dipole_M.r, quadl)*dipole_M.z;
+    return H;
+}
+
+// HJ
+
+complex_t G_HJ_1(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, i_source, sheet_I);
+    return factor*(TLGF.I_h-TLGF.I_e)*besselj(2.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_HJ_2(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, i_source, sheet_I);
+    return factor*(TLGF.I_h+TLGF.I_e)*besselj(0.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_HJ_3(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, v_source, sheet_I);
+    return factor*(k_rho_*TLGF.I_e)*besselj(1.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t G_HJ_4(const complex_t k_rho, void *args_){
+    integrand_args_t *args=(integrand_args_t*)args_;
+    const real_t rho=args->rho;
+    const real_t z=args->z;
+    const real_t z_=args->z_;
+    complex_t k_rho_=k_rho;
+    complex_t factor=args->config.detour(k_rho_, rho, abs(z-z_));
+    TLGF_t TLGF=args->config.TLGF_r(k_rho_, z, z_, i_source, sheet_I);
+    return factor*(k_rho_*TLGF.V_h)*besselj(1.0, k_rho_*args->rho)*k_rho_;
+}
+
+complex_t configuration_t::G_HJ_xx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_1_=configuration_t::hankel_transform(G_HJ_1, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=+0.5*sin(2.0*phi)*G_HJ_1_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.xx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_xy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_1_=configuration_t::hankel_transform(G_HJ_1, &args, quadl);
+    complex_t G_HJ_2_=configuration_t::hankel_transform(G_HJ_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=+0.5*G_HJ_2_;
+    complex_t I_2=-0.5*cos(2.0*phi)*G_HJ_1_;
+    complex_t I_=I_1+I_2;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.xy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_yx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_1_=configuration_t::hankel_transform(G_HJ_1, &args, quadl);
+    complex_t G_HJ_2_=configuration_t::hankel_transform(G_HJ_2, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-0.5*G_HJ_2_;
+    complex_t I_2=-0.5*cos(2.0*phi)*G_HJ_1_;
+    complex_t I_=I_1+I_2;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.yx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_yy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_1_=configuration_t::hankel_transform(G_HJ_1, &args, quadl);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-0.5*sin(2.0*phi)*G_HJ_1_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.yy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_xz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_3_=configuration_t::hankel_transform(G_HJ_3, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-((eta_0)/(j*this->k_0*this->layers[m].eps))*sin(phi)*G_HJ_3_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.xz;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_yz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_3_=configuration_t::hankel_transform(G_HJ_3, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((eta_0)/(j*this->k_0*this->layers[m].mu))*cos(phi)*G_HJ_3_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.yz;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_zx(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_4_=configuration_t::hankel_transform(G_HJ_4, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=((1.0)/(j*eta_0*this->k_0*this->layers[n].mu))*sin(phi)*G_HJ_4_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.zx;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_zy(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    integrand_args_t args={rho, phi, r.z, r_.z, *this};
+    complex_t G_HJ_4_=configuration_t::hankel_transform(G_HJ_4, &args, quadl);
+    const complex_t j=complex_t(0.0, 1.0);
+    const size_t n=this->find_layer(r.z);
+    const size_t m=this->find_layer(r_.z);
+    complex_t I_1=-((1.0)/(j*eta_0*this->k_0*this->layers[n].mu))*cos(phi)*G_HJ_4_;
+    complex_t I_=I_1;
+    if (m==n){
+        Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);
+        I_ = I_+DGF.zy;
+    }
+    return I_;
+}
+
+complex_t configuration_t::G_HJ_zz(const position_t r, const position_t r_, quadl_t quadl){
+    const real_t rho=sqrt((r.x-r_.x)*(r.x-r_.x)+(r.y-r_.y)*(r.y-r_.y));
+    const real_t phi=atan2(r.y-r_.y, r.x-r_.x);
+    return 0.0*rho*phi*quadl.N;
+}
+
+near_field_t configuration_t::compute_H_J_near_field(const position_t r, const dipole_t dipole_J, 
+    quadl_t quadl){
+    near_field_t H;
+    H.x = this->G_HJ_xx(r, dipole_J.r, quadl)*dipole_J.x+this->G_HJ_xy(r, dipole_J.r, quadl)*dipole_J.y+this->G_HJ_xz(r, dipole_J.r, quadl)*dipole_J.z;
+    H.y = this->G_HJ_yx(r, dipole_J.r, quadl)*dipole_J.x+this->G_HJ_yy(r, dipole_J.r, quadl)*dipole_J.y+this->G_HJ_yz(r, dipole_J.r, quadl)*dipole_J.z;
+    H.z = this->G_HJ_zx(r, dipole_J.r, quadl)*dipole_J.x+this->G_HJ_zy(r, dipole_J.r, quadl)*dipole_J.y+this->G_HJ_zz(r, dipole_J.r, quadl)*dipole_J.z;
+    return H;
 }

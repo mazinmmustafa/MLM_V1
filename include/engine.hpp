@@ -91,6 +91,26 @@ struct integrand_args{
     position_t r, r_;
 };
 
+struct dipole_t{
+    position_t r;
+    real_t theta=0.0, phi=0.0;
+    complex_t Il=0.0;
+    complex_t x=0.0, y=0.0, z=0.0;
+    dipole_t(const position_t r, const real_t theta, const real_t phi, const complex_t Il){
+        this->r = r;
+        this->theta = theta;
+        this->phi = phi;
+        this->Il = Il;
+        this->x = Il*sin(theta)*cos(phi);
+        this->y = Il*sin(theta)*sin(phi);
+        this->z = Il*cos(theta);
+    }
+};
+
+struct near_field_t{
+    complex_t x=0.0, y=0.0, z=0.0;
+};
+
 class configuration_t{
     private:
         
@@ -133,6 +153,45 @@ class configuration_t{
         complex_t G_EJ_zx(const position_t r, const position_t r_, quadl_t quadl);
         complex_t G_EJ_zy(const position_t r, const position_t r_, quadl_t quadl);
         complex_t G_EJ_zz(const position_t r, const position_t r_, quadl_t quadl);
+        // EM
+        Greens_functions_t G_EM_0(const position_t r, const position_t r_);
+        complex_t G_EM_xx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_xy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_xz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_yx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_yy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_yz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_zx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_zy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_EM_zz(const position_t r, const position_t r_, quadl_t quadl);
+        // E-field
+        near_field_t compute_E_J_near_field(const position_t r, const dipole_t dipole_J, quadl_t quadl);
+        near_field_t compute_E_M_near_field(const position_t r, const dipole_t dipole_M, quadl_t quadl);
+        // HJ
+        Greens_functions_t G_HJ_0(const position_t r, const position_t r_);
+        complex_t G_HJ_xx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_xy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_xz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_yx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_yy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_yz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_zx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_zy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HJ_zz(const position_t r, const position_t r_, quadl_t quadl);
+        // HM
+        Greens_functions_t G_HM_0(const position_t r, const position_t r_);
+        complex_t G_HM_xx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_xy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_xz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_yx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_yy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_yz(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_zx(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_zy(const position_t r, const position_t r_, quadl_t quadl);
+        complex_t G_HM_zz(const position_t r, const position_t r_, quadl_t quadl);
+        // H-field
+        near_field_t compute_H_J_near_field(const position_t r, const dipole_t dipole_J, quadl_t quadl);
+        near_field_t compute_H_M_near_field(const position_t r, const dipole_t dipole_M, quadl_t quadl);
 };
 
 // Functions

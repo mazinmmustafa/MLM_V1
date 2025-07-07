@@ -12,7 +12,8 @@ int main(){
     // test_configuration();
     // test_TLGFs();
     // test_integrands();
-    test_DGFs_Paulus();
+    // test_DGFs_Paulus();
+    test_DGFs_Chew();
 
     return 0;
 }

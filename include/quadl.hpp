@@ -9,7 +9,6 @@
 // Definitions
 class quadl_t{
     private:
-        size_t N=0;
         size_t k_max=0;
         real_t *x=null, *w=null;
         size_t is_allocated=false;
@@ -31,6 +30,7 @@ class quadl_t{
             void *args, const real_t a_x, const real_t b_x, const real_t a_y, const real_t b_y, 
             const real_t a_z, const real_t b_z, size_t &k, const complex_t I_p);
     public:
+        size_t N=0;
         quadl_t();
         ~quadl_t();
         void set(const size_t N, const size_t k_max, const real_t tol);

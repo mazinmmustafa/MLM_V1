@@ -219,10 +219,10 @@ void test_DGFs_Paulus(){
 
     config.set(N_layers, freq);
     size_t n=0;
-    config.add_layer(n++, +0500.0*units::nm, +10000.0*units::nm, 1.0, 01.0);
-    config.add_layer(n++, +0000.0*units::nm, +0500.0*units::nm, 1.0, 02.0);
+    config.add_layer(n++, +0500.0*units::nm, +10000.0*units::nm, 1.0, 1.0);
+    config.add_layer(n++, +0000.0*units::nm, +0500.0*units::nm, 1.0, 2.0);
     config.add_layer(n++, -0500.0*units::nm, +0000.0*units::nm, 1.0, 10.0);
-    config.add_layer(n++, -10000.0*units::nm, -0500.0*units::nm, 1.0, 01.0);
+    config.add_layer(n++, -10000.0*units::nm, -0500.0*units::nm, 1.0, 1.0);
 
     config.log();
 
@@ -238,7 +238,7 @@ void test_DGFs_Paulus(){
     const real_t phi=+45.0*pi/180.0;
     const real_t rho=633.0*units::nm;
 
-    range_t x, z;
+    range_t z;
     const real_t z_min=-1000.0*units::nm;
     const real_t z_max=+1000.0*units::nm;
     z.set(z_min, z_max, Ns);
@@ -266,6 +266,102 @@ void test_DGFs_Paulus(){
     timer.unset();
     file.close();
 
+    z.unset();
+    quadl.unset();
+    config.unset();
+
+}
+
+void test_DGFs_Chew(){
+
+    const size_t N_layers=7;
+    configuration_t config;
+
+    const real_t lambda_0=1.0*units::m;
+    const real_t freq=c_0/lambda_0;
+
+    config.set(N_layers, freq);
+    size_t n=0;
+    config.add_layer(n++, +0.0*units::m, +10.0*units::m, 1.0, 1.0);
+    config.add_layer(n++, -0.2*units::m, +0.0*units::m, 1.0, 2.6);
+    config.add_layer(n++, -0.5*units::m, -0.2*units::m, 3.2, 6.5);
+    config.add_layer(n++, -1.0*units::m, -0.5*units::m, 6.0, 4.2);
+    config.add_layer(n++, -1.3*units::m, -1.0*units::m, 3.2, 6.5);
+    config.add_layer(n++, -1.5*units::m, -1.3*units::m, 1.0, 2.6);
+    config.add_layer(n++, -10.0*units::m, -1.5*units::m, 1.0, 1.0);
+
+    const position_t r_=cartesian_t(0.0*units::m, 0.0*units::m, -1.4*units::m);
+    const real_t theta_0=+20.0*pi/180.0;
+    const real_t phi_0=+30.0*pi/180.0;
+    const complex_t Il=+1.0;
+    const complex_t Kl=+1.0;
+    dipole_t J=dipole_t(r_, theta_0, phi_0, Il);
+    dipole_t M=dipole_t(r_, theta_0, phi_0, Kl);
+    const real_t y=+1.0*units::m;
+    const real_t z=-0.3*units::m;
+
+    config.log();
+
+    //
+    quadl_t quadl;
+    const size_t N_quadl=16;
+    const size_t k_max=15;
+    const real_t tol=1.0E-4;
+    quadl.set(N_quadl, k_max, tol);
+
+    const size_t Ns=1001;
+
+    range_t x;
+    const real_t x_min=-3.0*units::m;
+    const real_t x_max=+3.0*units::m;
+    x.set(x_min, x_max, Ns);
+    x.linspace();
+
+    file_t file_EJ, file_EM;
+    file_t file_HJ, file_HM;
+    file_EJ.open("data/Chew/data_EJ.txt", 'w');
+    file_EM.open("data/Chew/data_EM.txt", 'w');
+    file_HJ.open("data/Chew/data_HJ.txt", 'w');
+    file_HM.open("data/Chew/data_HM.txt", 'w');
+    stopwatch_t timer;
+    timer.set();
+    for (size_t i=0; i<Ns; i++){
+        progress_bar(i, Ns, "computing E fields...");
+        file_EJ.write("%21.14E ", x(i));
+        file_EM.write("%21.14E ", x(i));
+        file_HJ.write("%21.14E ", x(i));
+        file_HM.write("%21.14E ", x(i));
+        position_t r=cartesian_t(x(i), y, z);
+        near_field_t E;
+        E = config.compute_E_J_near_field(r, J, quadl);
+        file_EJ.write("%21.14E ", abs(E.x));
+        file_EJ.write("%21.14E ", abs(E.y));
+        file_EJ.write("%21.14E ", abs(E.z));
+        file_EJ.write("\n");
+        E = config.compute_E_M_near_field(r, M, quadl);
+        file_EM.write("%21.14E ", abs(E.x));
+        file_EM.write("%21.14E ", abs(E.y));
+        file_EM.write("%21.14E ", abs(E.z));
+        file_EM.write("\n");
+        near_field_t H;
+        H = config.compute_H_J_near_field(r, J, quadl);
+        file_HJ.write("%21.14E ", abs(H.x));
+        file_HJ.write("%21.14E ", abs(H.y));
+        file_HJ.write("%21.14E ", abs(H.z));
+        file_HJ.write("\n");
+        H = config.compute_H_M_near_field(r, M, quadl);
+        file_HM.write("%21.14E ", abs(H.x));
+        file_HM.write("%21.14E ", abs(H.y));
+        file_HM.write("%21.14E ", abs(H.z));
+        file_HM.write("\n");
+    }
+    timer.unset();
+    file_EJ.close();
+    file_EM.close();
+    file_HJ.close();
+    file_HM.close();
+
+    x.unset();
     quadl.unset();
     config.unset();
 

@@ -17,5 +17,6 @@ void test_configuration();
 void test_TLGFs();
 void test_integrands();
 void test_DGFs_Paulus();
+void test_DGFs_Chew();
 
 #endif
