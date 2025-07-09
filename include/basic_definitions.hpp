@@ -46,7 +46,6 @@ const real_t m_e=9.1093837139E-31; // kg
 
 // engineering
 namespace units{
-    // const real_t m=1.0E+0;
     const real_t m=1.0E+0;
     const real_t cm=1.0E-2;
     const real_t mm=1.0E-3;

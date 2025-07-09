@@ -18,5 +18,6 @@ void test_TLGFs();
 void test_integrands();
 void test_DGFs_Paulus();
 void test_DGFs_Chew();
+void test_DGFs_Gold_Kretschmann();
 
 #endif

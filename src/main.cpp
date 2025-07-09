@@ -13,7 +13,8 @@ int main(){
     // test_TLGFs();
     // test_integrands();
     // test_DGFs_Paulus();
-    test_DGFs_Chew();
+    // test_DGFs_Chew();
+    test_DGFs_Gold_Kretschmann();
 
     return 0;
 }

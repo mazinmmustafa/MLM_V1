@@ -502,7 +502,10 @@ complex_t configuration_t::detour(complex_t &k_rho, const real_t rho, const real
     k_rho = k_0*k_rho;
     const complex_t j=complex_t(0.0, 1.0);
     const real_t a=this->k_0*(1.0+this->k_min);
-    const real_t b=rho>distance ? (this->k_0<1.0/rho ? this->k_0 : 1.0/rho) : this->k_0;
+    const real_t ratio=0.01;
+    const real_t b=rho>distance ? (this->k_0<1.0/rho ? ratio*this->k_0 : ratio*1.0/rho) : ratio*this->k_0;
+    // const real_t b=0.0001*k_0+(0.0*distance*rho);
+    // const real_t b=rho>distance ? (this->k_0<1.0/rho ? this->k_0 : 1.0/rho) : this->k_0;
     const real_t t=real(k_rho);
     const real_t x=t;
     const real_t y=t<a ? b*sin(pi*t/a) : 0.0;
@@ -524,9 +527,9 @@ Greens_functions_t configuration_t::G_EJ_0(const position_t r, const position_t 
     const complex_t factor=-j*omega*mu_0*mu;
     //
     if (R==0.0){
-        DGF.xx = factor*(-1.0/(3.0*k*k));
-        DGF.yy = factor*(-1.0/(3.0*k*k));
-        DGF.zz = factor*(-1.0/(3.0*k*k));
+        DGF.xx = 0.0*factor*(-1.0/(3.0*k*k));
+        DGF.yy = 0.0*factor*(-1.0/(3.0*k*k));
+        DGF.zz = 0.0*factor*(-1.0/(3.0*k*k));
         DGF.xy = DGF.xz = DGF.yx = DGF.yz = DGF.zx = DGF.zy = 0.0;
     }else{
         DGF.xx = factor*(g+(1.0/(k*k))*(g1/R+((r.x-r_.x)/R)*((r.x-r_.x)/R)*(g2-g1/R)));
@@ -556,9 +559,9 @@ Greens_functions_t configuration_t::G_HM_0(const position_t r, const position_t 
     const complex_t factor=-j*omega*eps_0*eps;
     //
     if (R==0.0){
-        DGF.xx = factor*(-1.0/(3.0*k*k));
-        DGF.yy = factor*(-1.0/(3.0*k*k));
-        DGF.zz = factor*(-1.0/(3.0*k*k));
+        DGF.xx = 0.0*factor*(-1.0/(3.0*k*k));
+        DGF.yy = 0.0*factor*(-1.0/(3.0*k*k));
+        DGF.zz = 0.0*factor*(-1.0/(3.0*k*k));
         DGF.xy = DGF.xz = DGF.yx = DGF.yz = DGF.zx = DGF.zy = 0.0;
     }else{
         DGF.xx = factor*(g+(1.0/(k*k))*(g1/R+((r.x-r_.x)/R)*((r.x-r_.x)/R)*(g2-g1/R)));
@@ -640,7 +643,7 @@ struct integrand_args_t{
 complex_t configuration_t::hankel_transform(complex_t func(complex_t, void*), void *args, quadl_t quadl){
     size_t flag;
     complex_t ans=quadl.integral_1d(func, args, 0.0, k_min, flag);
-    if (flag==true){print("no convergence!\n");}
+    if (flag==true){print("no convergence!\n"); exit(1);}
     return ans/lambda_0;
 }
 
