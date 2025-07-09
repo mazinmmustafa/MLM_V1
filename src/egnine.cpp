@@ -502,10 +502,9 @@ complex_t configuration_t::detour(complex_t &k_rho, const real_t rho, const real
     k_rho = k_0*k_rho;
     const complex_t j=complex_t(0.0, 1.0);
     const real_t a=this->k_0*(1.0+this->k_min);
-    const real_t ratio=0.01;
-    const real_t b=rho>distance ? (this->k_0<1.0/rho ? ratio*this->k_0 : ratio*1.0/rho) : ratio*this->k_0;
-    // const real_t b=0.0001*k_0+(0.0*distance*rho);
-    // const real_t b=rho>distance ? (this->k_0<1.0/rho ? this->k_0 : 1.0/rho) : this->k_0;
+    const real_t ratio=0.1+(0.0*distance);
+    // const real_t b=rho>distance ? (this->k_0<1.0/rho ? ratio*this->k_0 : ratio*1.0/rho) : ratio*this->k_0;
+    const real_t b=this->k_0<1.0/rho ? ratio*this->k_0 : ratio*1.0/rho;
     const real_t t=real(k_rho);
     const real_t x=t;
     const real_t y=t<a ? b*sin(pi*t/a) : 0.0;
@@ -1419,7 +1418,7 @@ complex_t configuration_t::G_HJ_yz(const position_t r, const position_t r_, quad
     const complex_t j=complex_t(0.0, 1.0);
     const size_t n=this->find_layer(r.z);
     const size_t m=this->find_layer(r_.z);
-    complex_t I_1=((eta_0)/(j*this->k_0*this->layers[m].mu))*cos(phi)*G_HJ_3_;
+    complex_t I_1=((eta_0)/(j*this->k_0*this->layers[m].eps))*cos(phi)*G_HJ_3_;
     complex_t I_=I_1;
     if (m==n){
         Greens_functions_t DGF=configuration_t::G_HJ_0(r, r_);

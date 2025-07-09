@@ -19,5 +19,7 @@ void test_integrands();
 void test_DGFs_Paulus();
 void test_DGFs_Chew();
 void test_DGFs_Gold_Kretschmann();
+void test_DGFs_Gold_Kretschmann_cut();
+void test_DGFs_Paulus_near_field();
 
 #endif

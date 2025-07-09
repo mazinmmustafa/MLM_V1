@@ -442,6 +442,154 @@ void test_DGFs_Gold_Kretschmann(){
 
     x.unset();
     z.unset();
+
+
+    quadl.unset();
+    config.unset();
+
+}
+
+void test_DGFs_Gold_Kretschmann_cut(){
+
+    const size_t N_layers=3;
+    configuration_t config;
+
+    const real_t lambda_0=633.0*units::nm;
+    const real_t freq=c_0/lambda_0;
+
+    const complex_t j=complex_t(0.0, +1.0);
+    config.set(N_layers, freq);
+    size_t n=0;
+    config.add_layer(n++, +0.0*units::nm, +2500.0*units::nm, 1.0, 2.3013);
+    config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.753-j*1.2596);
+    config.add_layer(n++, -2500.0*units::nm, -50.0*units::nm, 1.0, 1.0);
+;
+
+    const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +20.0*units::nm);
+    const real_t theta_0=+0.0*pi/180.0;
+    const real_t phi_0=+0.0*pi/180.0;
+    const complex_t Il=+1.0;
+    dipole_t J=dipole_t(r_, theta_0, phi_0, Il);
+    const real_t x=+0.0*units::nm;
+    const real_t y=+0.0*units::nm;
+
+    config.log();
+
+    //
+    quadl_t quadl;
+    const size_t N_quadl=16;
+    const size_t k_max=15;
+    const real_t tol=1.0E-4;
+    quadl.set(N_quadl, k_max, tol);
+
+    const size_t Ns=1001;
+
+    range_t z;
+    const real_t z_min=-2000.0*units::nm;
+    const real_t z_max=+2000.0*units::nm;
+    z.set(z_min, z_max, Ns);
+    z.linspace();
+
+    file_t file;
+    file.open("data/GoldKretschmann/data_cut.txt", 'w');
+    stopwatch_t timer;
+    timer.set();
+    for (size_t i=0; i<Ns; i++){
+        progress_bar(i, Ns, "computing E fields...");
+        file.write("%21.14E ", z(i));
+        position_t r=cartesian_t(x, y, z(i));
+        near_field_t E;
+        E = config.compute_E_J_near_field(r, J, quadl);
+        file.write("%21.14E %21.14E %21.14E\n", abs(E.x), abs(E.y), abs(E.z));
+        file.write("\n");
+    }
+    timer.unset();
+    file.close();
+
+    z.unset();
+    
+    quadl.unset();
+    config.unset();
+
+}
+
+
+void test_DGFs_Paulus_near_field(){
+
+    const size_t N_layers=4;
+    configuration_t config;
+
+    const real_t lambda_0=633.0*units::nm;
+    const real_t freq=c_0/lambda_0;
+
+    config.set(N_layers, freq);
+    size_t n=0;
+    config.add_layer(n++, +0500.0*units::nm, +10000.0*units::nm, 1.0, 1.0);
+    config.add_layer(n++, +0000.0*units::nm, +0500.0*units::nm, 1.0, 2.0);
+    config.add_layer(n++, -0500.0*units::nm, +0000.0*units::nm, 1.0, 10.0);
+    config.add_layer(n++, -10000.0*units::nm, -0500.0*units::nm, 1.0, 1.0);
+;
+
+    const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +20.0*units::nm);
+    const real_t theta_0=+0.0*pi/180.0;
+    const real_t phi_0=+0.0*pi/180.0;
+    const complex_t Il=+1.0;
+    dipole_t J=dipole_t(r_, theta_0, phi_0, Il);
+    const real_t y=+0.0*units::nm;
+
+    config.log();
+
+    //
+    quadl_t quadl;
+    const size_t N_quadl=16;
+    const size_t k_max=15;
+    const real_t tol=1.0E-4;
+    quadl.set(N_quadl, k_max, tol);
+
+    const size_t Ns=201;
+    const size_t Nx=Ns, Nz=Ns;
+
+    range_t x, z;
+    const real_t x_min=-1000.0*units::nm;
+    const real_t x_max=+1000.0*units::nm;
+    const real_t z_min=-1000.0*units::nm;
+    const real_t z_max=+1000.0*units::nm;
+    x.set(x_min, x_max, Nx);
+    z.set(z_min, z_max, Nz);
+    x.linspace();
+    z.linspace();
+
+    file_t file_x, file_z, file_data;
+    file_x.open("data/Paulus/data_x.txt", 'w');
+    file_z.open("data/Paulus/data_z.txt", 'w');
+    file_data.open("data/Paulus/data.txt", 'w');
+    stopwatch_t timer;
+    timer.set();
+    for (size_t ii=0; ii<Nx; ii++){
+        progress_bar(ii, Nx, "computing E fields...");
+        for (size_t jj=0; jj<Nz; jj++){
+            file_x.write("%21.14E ", x(ii));
+            file_z.write("%21.14E ", z(jj));
+            position_t r=cartesian_t(x(ii), y, z(jj));
+            near_field_t E;
+            E = config.compute_E_J_near_field(r, J, quadl);
+            const complex_t E_mag=sqrt(abs(E.x*E.x)+abs(E.y*E.y)+abs(E.z*E.z));
+            // const complex_t E_mag=sqrt(pow(real(E.x), 2.0)+pow(real(E.y), 2.0)+pow(real(E.z), 2.0));
+            file_data.write("%21.14E ", E_mag);
+        }
+        file_x.write("\n");
+        file_z.write("\n");
+        file_data.write("\n");
+    }
+    timer.unset();
+    file_x.close();
+    file_z.close();
+    file_data.close();
+
+    x.unset();
+    z.unset();
+
+
     quadl.unset();
     config.unset();
 
