@@ -396,7 +396,7 @@ void test_DGFs_Gold_Kretschmann(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=8;
+    const size_t N_quadl=32;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
@@ -429,7 +429,8 @@ void test_DGFs_Gold_Kretschmann(){
             near_field_t E;
             E = config.compute_E_J_near_field(r, J, quadl);
             // const complex_t E_mag=sqrt(abs(E.x*E.x)+abs(E.y*E.y)+abs(E.z*E.z));
-            const complex_t E_mag=sqrt(pow(real(E.x), 2.0)+pow(real(E.y), 2.0)+pow(real(E.z), 2.0));
+            // const real_t E_mag=sqrt(pow(real(E.x), 2.0)+pow(real(E.y), 2.0)+pow(real(E.z), 2.0));
+            const real_t E_mag=sqrt(pow(real(E.z), 2.0));
             file_data.write("%21.14E ", E_mag);
         }
         file_x.write("\n");
@@ -478,7 +479,7 @@ void test_DGFs_Gold_Kretschmann_cut(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=16;
+    const size_t N_quadl=32;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
@@ -486,8 +487,8 @@ void test_DGFs_Gold_Kretschmann_cut(){
     const size_t Ns=1001;
 
     range_t z;
-    const real_t z_min=-2000.0*units::nm;
-    const real_t z_max=+2000.0*units::nm;
+    const real_t z_min=-400.0*units::nm;
+    const real_t z_max=+400.0*units::nm;
     z.set(z_min, z_max, Ns);
     z.linspace();
 

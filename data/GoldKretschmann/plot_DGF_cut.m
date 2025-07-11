@@ -6,4 +6,4 @@ figure()
 hold on
 plot(data(:, 1), 20*log10(data(:, 4)))
 hold off
-ylim([200 400])
+##ylim([200 400])
