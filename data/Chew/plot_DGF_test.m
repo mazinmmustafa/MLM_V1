@@ -1,13 +1,13 @@
 close all; clear; clc;
 
-n = 4;
- 
+n = 3;
+
 data_J = load('Fields_J.dat_save');
 data_M = load('Fields_M.dat_save');
 
 
 if n==1
-  
+
   data = load('data_EJ.txt');
 
   figure()
@@ -31,7 +31,7 @@ if n==1
 end
 
 if n==2
-  
+
   data = load('data_EM.txt');
 
   figure()
@@ -78,7 +78,7 @@ if n==3
 end
 
 if n==4
-  
+
   data = load('data_HM.txt');
 
   figure()
@@ -98,7 +98,7 @@ if n==4
   plot(data(:, 1), data(:, 4), '-')
   plot(data_M(:, 1), data_M(:, 7), 'o', 'MarkerSize', 4)
   hold off
-  
+
 end
 
 

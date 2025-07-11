@@ -304,7 +304,7 @@ void test_DGFs_Chew(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=16;
+    const size_t N_quadl=8;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
