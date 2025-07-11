@@ -228,12 +228,12 @@ void test_DGFs_Paulus(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=16;
+    const size_t N_quadl=32;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=1001;
+    const size_t Ns=401;
     const real_t z_=+750*units::nm;
     const real_t phi=+45.0*pi/180.0;
     const real_t rho=633.0*units::nm;
@@ -304,12 +304,12 @@ void test_DGFs_Chew(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=8;
+    const size_t N_quadl=32;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=1001;
+    const size_t Ns=401;
 
     range_t x;
     const real_t x_min=-3.0*units::m;
@@ -343,6 +343,7 @@ void test_DGFs_Chew(){
         file_EM.write("%21.14E ", abs(E.y));
         file_EM.write("%21.14E ", abs(E.z));
         file_EM.write("\n");
+        progress_bar(i, Ns, "computing H fields...");
         near_field_t H;
         H = config.compute_H_J_near_field(r, J, quadl);
         file_HJ.write("%21.14E ", abs(H.x));
@@ -395,12 +396,12 @@ void test_DGFs_Gold_Kretschmann(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=16;
+    const size_t N_quadl=8;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=1001;
+    const size_t Ns=401;
     const size_t Nx=Ns, Nz=Ns;
 
     range_t x, z;
@@ -530,7 +531,7 @@ void test_DGFs_Paulus_near_field(){
     config.add_layer(n++, -10000.0*units::nm, -0500.0*units::nm, 1.0, 1.0);
 ;
 
-    const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +20.0*units::nm);
+    const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +200.0*units::nm);
     const real_t theta_0=+0.0*pi/180.0;
     const real_t phi_0=+0.0*pi/180.0;
     const complex_t Il=+1.0;
@@ -541,19 +542,19 @@ void test_DGFs_Paulus_near_field(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=16;
+    const size_t N_quadl=32;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=201;
+    const size_t Ns=1001;
     const size_t Nx=Ns, Nz=Ns;
 
     range_t x, z;
-    const real_t x_min=-1000.0*units::nm;
-    const real_t x_max=+1000.0*units::nm;
-    const real_t z_min=-1000.0*units::nm;
-    const real_t z_max=+1000.0*units::nm;
+    const real_t x_min=-2000.0*units::nm;
+    const real_t x_max=+2000.0*units::nm;
+    const real_t z_min=-2000.0*units::nm;
+    const real_t z_max=+2000.0*units::nm;
     x.set(x_min, x_max, Nx);
     z.set(z_min, z_max, Nz);
     x.linspace();
@@ -573,8 +574,8 @@ void test_DGFs_Paulus_near_field(){
             position_t r=cartesian_t(x(ii), y, z(jj));
             near_field_t E;
             E = config.compute_E_J_near_field(r, J, quadl);
-            const complex_t E_mag=sqrt(abs(E.x*E.x)+abs(E.y*E.y)+abs(E.z*E.z));
-            // const complex_t E_mag=sqrt(pow(real(E.x), 2.0)+pow(real(E.y), 2.0)+pow(real(E.z), 2.0));
+            // const complex_t E_mag=sqrt(abs(E.x*E.x)+abs(E.y*E.y)+abs(E.z*E.z));
+            const complex_t E_mag=sqrt(pow(real(E.x), 2.0)+pow(real(E.y), 2.0)+pow(real(E.z), 2.0));
             file_data.write("%21.14E ", E_mag);
         }
         file_x.write("\n");

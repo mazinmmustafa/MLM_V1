@@ -1,6 +1,6 @@
 close all; clear; clc;
 
-n = 3;
+n = 4;
 
 data_J = load('Fields_J.dat_save');
 data_M = load('Fields_M.dat_save');
