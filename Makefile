@@ -102,6 +102,7 @@ clean_data:
 	@find ./data/ -type f -name '*.fls' | xargs $(RM) -rv
 	@find ./data/ -type f -name '*.aux' | xargs $(RM) -rv
 	@find ./data/ -type f -name '*.fdb_latexmk' | xargs $(RM) -rv
+	@find ./data/ -type f -name '*.swp' | xargs $(RM) -rv
 	@find . -type f -name 'octave-workspace' | xargs $(RM) -rv
 
 .PHONY: valgrind 
