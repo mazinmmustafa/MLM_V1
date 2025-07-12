@@ -112,7 +112,7 @@ struct near_field_t{
     complex_t x=0.0, y=0.0, z=0.0;
 };
 
-struct incident_plane_wave_field_E_0{
+struct incident_plane_wave_field_E_0_t{
     complex_t TM=0.0, TE=0.0;
 };
 
@@ -202,8 +202,8 @@ class configuration_t{
         near_field_t compute_H_J_near_field(const position_t r, const dipole_t dipole_J, quadl_t quadl);
         near_field_t compute_H_M_near_field(const position_t r, const dipole_t dipole_M, quadl_t quadl);
         // plane wave
-        near_field_plane_wave_t compute_plane_wave_E(const position_t r, const real_t theta_i, const real_t phi_i, 
-            const incident_plane_wave_field_E_0 E_0);
+        near_field_plane_wave_t compute_plane_wave(const position_t r, const real_t theta_i, const real_t phi_i, 
+            const incident_plane_wave_field_E_0_t E_0);
 };
 
 // Functions

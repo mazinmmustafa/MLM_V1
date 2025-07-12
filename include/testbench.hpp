@@ -21,5 +21,8 @@ void test_DGFs_Chew();
 void test_DGFs_Gold_Kretschmann();
 void test_DGFs_Gold_Kretschmann_cut();
 void test_DGFs_Paulus_near_field();
+void test_planar_wave_Chew_cut();
+void test_Gold_Kretschmann_reflection();
+void test_planar_wave_Gold_Kretschmann_near_field();
 
 #endif

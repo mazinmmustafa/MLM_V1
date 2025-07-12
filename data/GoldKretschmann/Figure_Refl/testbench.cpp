@@ -692,10 +692,10 @@ void test_Gold_Kretschmann_reflection(){
     timer.set();
     for (size_t i=0; i<Ns; i++){
         progress_bar(i, Ns, "computing reflection coefficients...");
-        const complex_t k_rho_i=abs(theta_i(i))<=pi/2.0 ? 
+        const complex_t k_rho_i=abs(theta_i(i))<=pi ? 
             config.layers[0].k*sin(theta_i(i)) : config.layers[config.N-1].k*sin(theta_i(i));
-        const size_t n=abs(theta_i(i))<=pi/2.0 ? 0 : (config.N-1);
-        Gamma_t Gamma=abs(theta_i(i))<=pi/2.0 ? config.refl_d(k_rho_i, n, sheet_I) : config.refl_u(k_rho_i, n, sheet_I);
+        const size_t n=abs(theta_i(i))<=pi ? 0 : (config.N-1);
+        Gamma_t Gamma=config.refl_d(k_rho_i, n, sheet_I);
         file.write("%21.14E %21.14E %21.14E\n", theta_i(i)*180.0/pi, 
             pow(abs(Gamma.Gamma_e), 2.0), pow(abs(Gamma.Gamma_h), 2.0));
     }
