@@ -1478,3 +1478,48 @@ near_field_t configuration_t::compute_H_J_near_field(const position_t r, const d
     H.z = this->G_HJ_zx(r, dipole_J.r, quadl)*dipole_J.x+this->G_HJ_zy(r, dipole_J.r, quadl)*dipole_J.y+this->G_HJ_zz(r, dipole_J.r, quadl)*dipole_J.z;
     return H;
 }
+
+
+// plane wave
+
+enum side_t{top, bottom};
+
+near_field_plane_wave_t configuration_t::compute_plane_wave_E(const position_t r, const real_t theta_i, const real_t phi_i, 
+    const incident_plane_wave_field_E_0 E_0){
+    side_t side;
+    if (cos(theta_i)>=0){
+        side = top;
+    }else{
+        side = bottom;
+    }
+    near_field_plane_wave_t fields;
+    if (side==top){
+        const real_t z_=this->layers[0].z_max;
+        const complex_t eps_1=this->layers[0].eps;
+        const complex_t mu_1=this->layers[0].mu;
+        const complex_t eps=this->layers[find_layer(r.z)].eps;
+        const complex_t mu=this->layers[find_layer(r.z)].mu;
+        const complex_t k_1=this->layers[0].k;
+        const complex_t k_rho_i=k_1*sin(theta_i);
+        TLGF_t TLGF;
+        TLGF = configuration_t::TLGF(k_rho_i, r.z, z_, v_source, sheet_I);
+        const complex_t Z_e_1=this->layers[0].eta*cos(theta_i);
+        const complex_t Z_h_1=this->layers[0].eta/cos(theta_i);
+        vector_t<real_t> vector_rho_i, vector_phi_i, vector_z_i;
+        vector_rho_i = vector_t<real_t>(cos(phi_i), sin(phi_i), 0.0);
+        vector_phi_i = vector_t<real_t>(-sin(phi_i), cos(phi_i), 0.0);
+        vector_z_i = vector_t<real_t>(0.0, 0.0, 1.0);
+        const complex_t j=complex_t(0.0, +1.0);
+        vector_t<complex_t> vector_k_rho_i=vector_t<complex_t>(k_rho_i*cos(phi_i), k_rho_i*sin(phi_i), 0.0);
+        vector_t<real_t> vector_rho=vector_t<real_t>(r.x, r.y, 0.0);
+        const complex_t factor=exp(+j*vector_k_rho_i*vector_rho*cos(theta_i)*this->layers[0].z_max);
+        vector_t<complex_t> E, H;
+        E = -2.0*E_0.TM*(TLGF.V_e*cos(theta_i)*vector_rho_i-TLGF.I_e*Z_e_1*(eps_1/eps)*sin(theta_i)*vector_z_i)*factor+
+            -2.0*E_0.TE*(TLGF.V_h*vector_phi_i)*factor;
+        H = -2.0*E_0.TM*(TLGF.I_e*cos(theta_i)*vector_phi_i)*factor+
+            -2.0*E_0.TE*(-TLGF.I_h*vector_phi_i+TLGF.V_h*(mu_1/(mu*Z_h_1))*tan(theta_i)*vector_z_i)*factor;
+    }
+
+    return fields;
+}
+

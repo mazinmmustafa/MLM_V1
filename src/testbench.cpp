@@ -381,9 +381,13 @@ void test_DGFs_Gold_Kretschmann(){
     config.set(N_layers, freq);
     size_t n=0;
     // Nadson
-    config.add_layer(n++, +0.0*units::nm, +2000.0*units::nm, 1.0, 1.0);
+    // config.add_layer(n++, +0.0*units::nm, +2000.0*units::nm, 1.0, 3.0615);
+    // config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.67-j*1.35);
+    // config.add_layer(n++, -2000.0*units::nm, -50.0*units::nm, 1.0, 1.0);
+    // Gold Kretschmann
+    config.add_layer(n++, +0.0*units::nm, +2000.0*units::nm, 1.0, 2.3013);
     config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.753-j*1.2596);
-    config.add_layer(n++, -2000.0*units::nm, -50.0*units::nm, 1.0, 2.3013);
+    config.add_layer(n++, -2000.0*units::nm, -50.0*units::nm, 1.0, 1.0);
 ;
 
     const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +20.0*units::nm);
@@ -402,7 +406,7 @@ void test_DGFs_Gold_Kretschmann(){
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=2001;
+    const size_t Ns=1001;
     const size_t Nx=Ns, Nz=Ns;
 
     range_t x, z;
@@ -426,8 +430,8 @@ void test_DGFs_Gold_Kretschmann(){
             near_field_t E;
             E = config.compute_E_J_near_field(r, J, quadl);
             // const complex_t E_mag=sqrt(abs(E.x*E.x)+abs(E.y*E.y)+abs(E.z*E.z));
-            const real_t E_mag=sqrt(pow(real(E.x), 2.0)+pow(real(E.y), 2.0)+pow(real(E.z), 2.0));
             // const real_t E_mag=sqrt(pow(real(E.z), 2.0));
+            const real_t E_mag=sqrt(pow(real(E.x), 2.0)+pow(real(E.y), 2.0)+pow(real(E.z), 2.0));
 
             file_data.write("%21.14E %21.14E %21.14E\n", x(ii)/1.0E-6, z(jj)/1.0E-6, 20.0*log10(E_mag)); // Gnu_plot
         }

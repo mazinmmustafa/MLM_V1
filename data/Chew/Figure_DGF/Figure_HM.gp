@@ -23,9 +23,9 @@ set xlabel '$x$ [m]'
 set ylabel '$|H|$ [mA/m]'
 set title ''
 
-plot '../data_HM.txt' using 1:(1000*$2) with lines lw 4 dt 1 lt 6 title '$|H_{x}|$', \
-     '../data_HM.txt' using 1:(1000*$3) with lines lw 4 dt 1 lt 7 title '$|H_{y}|$', \
-     '../data_HM.txt' using 1:(1000*$4) with lines lw 4 dt 1 lt 10 title '$|H_{z}|$', \
+plot '../data_HM.txt' using 1:(1000*$2) with lines lw 4 dt 1 lt 6 title '$H_{x}$', \
+     '../data_HM.txt' using 1:(1000*$3) with lines lw 4 dt 1 lt 7 title '$H_{y}$', \
+     '../data_HM.txt' using 1:(1000*$4) with lines lw 4 dt 1 lt 10 title '$H_{z}$', \
      '../Fields_M.dat_save' using 1:(1000*$5) with points pt 6 ps 0.5 lt 16 title '', \
      '../Fields_M.dat_save' using 1:(1000*$6) with points pt 6 ps 0.5 lt 16 title '', \
      '../Fields_M.dat_save' using 1:(1000*$7) with points pt 6 ps 0.5 lt 16 title ''

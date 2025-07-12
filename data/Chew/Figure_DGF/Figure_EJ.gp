@@ -23,9 +23,9 @@ set xlabel '$x$ [m]'
 set ylabel '$|E|$ [V/m]'
 set title ''
 
-plot '../data_EJ.txt' using 1:2 with lines lw 4 dt 1 lt 6 title '$|E_{x}|$', \
-     '../data_EJ.txt' using 1:3 with lines lw 4 dt 1 lt 7 title '$|E_{y}|$', \
-     '../data_EJ.txt' using 1:4 with lines lw 4 dt 1 lt 10 title '$|E_{z}|$', \
+plot '../data_EJ.txt' using 1:2 with lines lw 4 dt 1 lt 6 title '$E_{x}$', \
+     '../data_EJ.txt' using 1:3 with lines lw 4 dt 1 lt 7 title '$E_{y}$', \
+     '../data_EJ.txt' using 1:4 with lines lw 4 dt 1 lt 10 title '$E_{z}$', \
      '../Fields_J.dat_save' using 1:2 with points pt 6 ps 0.5 lt 16 title '', \
      '../Fields_J.dat_save' using 1:3 with points pt 6 ps 0.5 lt 16 title '', \
      '../Fields_J.dat_save' using 1:4 with points pt 6 ps 0.5 lt 16 title ''

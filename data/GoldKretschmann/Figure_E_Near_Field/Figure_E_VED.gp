@@ -27,7 +27,7 @@ set size ratio 1
 set xrange [-2:+2]
 set yrange [-2:+2]
 
-set cbrange [+220:+320]
+set cbrange [+200:+320]
 
 set xtics 1
 set ytics 1
