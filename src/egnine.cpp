@@ -1605,11 +1605,11 @@ far_field_t configuration_t::compute_far_field_J(const real_t r, const real_t th
         vector_t<complex_t> J=vector_t<complex_t>(dipole_J.x, dipole_J.y, dipole_J.z);
         const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_J.r.x+vector_k_rho_s.y*dipole_J.r.y));
         vector_t<complex_t> E;
-        fields.E.theta = -j*2.0*k_1*(exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+        fields.E.theta = -j*2.0*k_1*(1.0+0.0*exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
             TLGF_i.V_e*(vector_rho_s*J)
             -TLGF_v.V_e*eta_1*(eps_1/eps_)*sin(theta_s)*(vector_z_s*J)
             )*factor;
-        fields.E.phi = -j*2.0*k_1*(exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+        fields.E.phi = -j*2.0*k_1*(1.0+0.0*exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
             +TLGF_i.V_h*cos(theta_s)*(vector_phi_s*J)
             )*factor;
         fields.H.theta = -fields.E.phi/eta_1;
@@ -1635,11 +1635,11 @@ far_field_t configuration_t::compute_far_field_J(const real_t r, const real_t th
         vector_t<complex_t> J=vector_t<complex_t>(dipole_J.x, dipole_J.y, dipole_J.z);
         const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_J.r.x+vector_k_rho_s.y*dipole_J.r.y));
         vector_t<complex_t> E;
-        fields.E.theta = -j*2.0*k_N*(exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+        fields.E.theta = -j*2.0*k_N*(1.0+0.0*exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
             TLGF_i.V_e*(vector_rho_s*J)
             -TLGF_v.V_e*eta_N*(eps_N/eps_)*sin(theta_s)*(vector_z_s*J)
             )*factor;
-        fields.E.phi = -j*2.0*k_N*(exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+        fields.E.phi = -j*2.0*k_N*(1.0+0.0*exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
             +TLGF_i.V_h*cos(theta_s)*(vector_phi_s*J)
             )*factor;
         fields.H.theta = -fields.E.phi/eta_N;
@@ -1678,10 +1678,10 @@ far_field_t configuration_t::compute_far_field_M(const real_t r, const real_t th
         vector_t<complex_t> M=vector_t<complex_t>(dipole_M.x, dipole_M.y, dipole_M.z);
         const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_M.r.x+vector_k_rho_s.y*dipole_M.r.y));
         vector_t<complex_t> E;
-        fields.E.theta = +j*2.0*k_1*(exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+        fields.E.theta = +j*2.0*k_1*(1.0+0.0*exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
             -TLGF_v.V_e*(vector_phi_s*M)
             )*factor;
-        fields.E.phi = +j*2.0*k_1*(exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+        fields.E.phi = +j*2.0*k_1*(1.0+0.0*exp(-j*k_1*r)/(4.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
             TLGF_v.V_h*cos(theta_s)*(vector_rho_s*M)
             -TLGF_i.V_h*(1.0/eta_1)*(mu_1/mu_)*sin(theta_s)*cos(theta_s)*(vector_z_s*M)
             )*factor;
@@ -1708,10 +1708,10 @@ far_field_t configuration_t::compute_far_field_M(const real_t r, const real_t th
         vector_t<complex_t> M=vector_t<complex_t>(dipole_M.x, dipole_M.y, dipole_M.z);
         const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_M.r.x+vector_k_rho_s.y*dipole_M.r.y));
         vector_t<complex_t> E;
-        fields.E.theta = +j*2.0*k_N*(exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+        fields.E.theta = +j*2.0*k_N*(1.0+0.0*exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
             -TLGF_v.V_e*(vector_phi_s*M)
             )*factor;
-        fields.E.phi = +j*2.0*k_N*(exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+        fields.E.phi = +j*2.0*k_N*(1.0+0.0*exp(-j*k_N*r)/(4.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
             TLGF_v.V_h*cos(theta_s)*(vector_rho_s*M)
             -TLGF_i.V_h*(1.0/eta_N)*(mu_N/mu_)*sin(theta_s)*cos(theta_s)*(vector_z_s*M)
             )*factor;

@@ -1,7 +1,7 @@
 close all; clear; clc;
 
-##filename = 'data_far_field_J';
-filename = 'data_far_field_M';
+filename = 'data_far_field_J';
+##filename = 'data_far_field_M';
 
 data = load(strcat(filename, '.txt'));
 

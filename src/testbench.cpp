@@ -945,3 +945,71 @@ void test_Chew_far_field(){
 
 }
 
+
+void test_Chew_far_field_2_elements(){
+
+    const size_t N_layers=7;
+    configuration_t config;
+
+    const real_t lambda_0=1.0*units::m;
+    const real_t freq=c_0/lambda_0;
+
+    config.set(N_layers, freq);
+    size_t n=0;
+    config.add_layer(n++, +0.0*units::m, +10.0*units::m, 1.0, 1.0);
+    config.add_layer(n++, -0.2*units::m, +0.0*units::m, 1.0, 2.6);
+    config.add_layer(n++, -0.5*units::m, -0.2*units::m, 3.2, 6.5);
+    config.add_layer(n++, -1.0*units::m, -0.5*units::m, 6.0, 4.2);
+    config.add_layer(n++, -1.3*units::m, -1.0*units::m, 3.2, 6.5);
+    config.add_layer(n++, -1.5*units::m, -1.3*units::m, 1.0, 2.6);
+    config.add_layer(n++, -10.0*units::m, -1.5*units::m, 1.0, 1.0);
+
+    const position_t r_1=cartesian_t(+0.5*units::m, 0.0*units::m, -0.6*units::m);
+    const position_t r_2=cartesian_t(-0.5*units::m, 0.0*units::m, -0.8*units::m);
+    const complex_t Il=+1.0;
+    dipole_t J_1=dipole_t(r_1, deg_to_rad(+30.0), deg_to_rad(+40.0), Il);
+    dipole_t J_2=dipole_t(r_2, deg_to_rad(+30.0), deg_to_rad(+20.0), Il);
+
+    real_t phi_s;
+
+    config.log();
+
+    //
+    const size_t Ns=4001;
+
+    range_t theta_s;
+
+    const real_t theta_s_min=deg_to_rad(-180.0);
+    const real_t theta_s_max=deg_to_rad(+180.0);
+    theta_s.set(theta_s_min, theta_s_max, Ns);
+    theta_s.linspace();
+
+
+    file_t file;
+    stopwatch_t timer;
+    timer.set();
+    file.open("data/Chew/data_far_field_J_2.txt", 'w');
+    for (size_t i=0; i<Ns; i++){
+        progress_bar(i, Ns, "computing far fields for J...");
+        const real_t r=1000.0*lambda_0;
+        file.write("%21.14E ", theta_s(i));
+        far_field_t field_1, field_2;
+        phi_s = deg_to_rad(0.0);
+        field_1 = config.compute_far_field_J(r, theta_s(i), phi_s, J_1);
+        field_2 = config.compute_far_field_J(r, theta_s(i), phi_s, J_2);
+        file.write("%21.14E ", 20.0*log10(abs(field_1.E.theta+field_2.E.theta)));
+        phi_s = deg_to_rad(90.0);
+        field_1 = config.compute_far_field_J(r, theta_s(i), phi_s, J_1);
+        field_2 = config.compute_far_field_J(r, theta_s(i), phi_s, J_2);
+        file.write("%21.14E ", 20.0*log10(abs(field_1.E.theta+field_2.E.theta)));
+        file.write("\n");
+    }
+    file.close();
+
+    timer.unset();
+
+    theta_s.unset();
+    config.unset();
+
+}
+
