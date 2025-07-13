@@ -20,6 +20,8 @@ int main(){
     // test_planar_wave_Chew_cut();
     // test_Gold_Kretschmann_reflection();
     // test_planar_wave_Gold_Kretschmann_near_field();
+    // test_plasmonic_WG_far_field();
+    // test_Chew_far_field();
 
     return 0;
 }

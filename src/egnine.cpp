@@ -258,13 +258,15 @@ tau_t configuration_t::tau_d(const complex_t k_rho, const complex_t V_m_e, const
 }
 
 size_t configuration_t::find_layer(const real_t z){
+    if (z>=this->layers[0].z_min){
+        return 0;
+    }
     for (size_t i=0; i<this->N; i++){
         if ((z>=this->layers[i].z_min)&&(z<=this->layers[i].z_max)){
             return i;
         }
     }
-    assert_error(false, "invalid layer");
-    return 0;
+    return (this->N-1);
 }
 
 TLGF_t configuration_t::TLGF_r(const complex_t k_rho, const real_t z, const real_t z_, const source_t source, const sheet_t sheet){
@@ -1482,14 +1484,15 @@ near_field_t configuration_t::compute_H_J_near_field(const position_t r, const d
 
 // plane wave
 
-enum side_t{top, bottom};
+enum side_t{none, top, bottom};
 
 near_field_plane_wave_t configuration_t::compute_plane_wave(const position_t r, const real_t theta_i, const real_t phi_i, 
     const incident_plane_wave_field_E_0_t E_0){
-    side_t side;
-    if (cos(theta_i)>=0){
+    side_t side=none;
+    if (cos(theta_i)>0){
         side = top;
-    }else{
+    }
+    if (cos(theta_i)<0){
         side = bottom;
     }
     near_field_plane_wave_t fields;
@@ -1560,4 +1563,156 @@ near_field_plane_wave_t configuration_t::compute_plane_wave(const position_t r, 
     return fields;
 }
 
+Gamma_t configuration_t::compute_Gamma(const real_t theta_i, const sheet_t sheet){
+    const complex_t k_rho_i=cos(theta_i)>=0.0 ? 
+        this->layers[0].k*sin(theta_i) : this->layers[this->N-1].k*sin(theta_i);
+    const size_t n=cos(theta_i)>=0.0 ? 0 : (this->N-1);
+    Gamma_t Gamma=cos(theta_i)>=0.0 ? this->refl_d(k_rho_i, n, sheet_I) : this->refl_u(k_rho_i, n, sheet);
+    return Gamma;
+}
 
+// far field
+
+const real_t cos_theta_min_horizon=1.0E-6;
+
+far_field_t configuration_t::compute_far_field_J(const real_t r, const real_t theta_s, const real_t phi_s, 
+    const dipole_t dipole_J){
+    side_t side=none;
+    if (cos(theta_s)>+cos_theta_min_horizon){
+        side = top;
+    }
+    if (cos(theta_s)<-cos_theta_min_horizon){
+        side = bottom;
+    }
+    far_field_t fields;
+    if (side==top){
+        const size_t m=configuration_t::find_layer(dipole_J.r.z);
+        const real_t z_=this->layers[0].z_max;
+        const complex_t eps_1=this->layers[0].eps;
+        const complex_t eps_=this->layers[m].eps;
+        const complex_t k_1=this->layers[0].k;
+        const complex_t k_rho_s=k_1*sin(theta_s);
+        TLGF_t TLGF_i, TLGF_v;
+        TLGF_i = configuration_t::TLGF(k_rho_s, z_, dipole_J.r.z, i_source, sheet_I);
+        TLGF_v = configuration_t::TLGF(k_rho_s, z_, dipole_J.r.z, v_source, sheet_I);
+        const complex_t eta_1=this->layers[0].eta;
+        vector_t<real_t> vector_rho_s, vector_phi_s, vector_z_s;
+        vector_rho_s = vector_t<real_t>(cos(phi_s), sin(phi_s), 0.0);
+        vector_phi_s = vector_t<real_t>(-sin(phi_s), cos(phi_s), 0.0);
+        vector_z_s = vector_t<real_t>(0.0, 0.0, 1.0);
+        const complex_t j=complex_t(0.0, +1.0);
+        vector_t<complex_t> vector_k_rho_s=vector_t<complex_t>(k_rho_s*cos(phi_s), k_rho_s*sin(phi_s), 0.0);
+        vector_t<complex_t> J=vector_t<complex_t>(dipole_J.x, dipole_J.y, dipole_J.z);
+        const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_J.r.x+vector_k_rho_s.y*dipole_J.r.y));
+        vector_t<complex_t> E;
+        fields.E.theta = -j*k_1*(exp(-j*k_1*r)/(2.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+            TLGF_i.V_e*(vector_rho_s*J)-TLGF_v.V_e*eta_1*(eps_1/eps_)*sin(theta_s)*(vector_z_s*J)
+            )*factor;
+        fields.E.phi = -j*k_1*(exp(-j*k_1*r)/(2.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+            +TLGF_i.V_h*cos(theta_s)*(vector_phi_s*J)
+            )*factor;
+        fields.H.theta = -fields.E.phi/eta_1;
+        fields.H.phi = -fields.E.theta/eta_1;
+    }
+    if (side==bottom){
+        const size_t m=configuration_t::find_layer(dipole_J.r.z);
+        const real_t z_=this->layers[this->N-1].z_min;
+        const complex_t eps_N=this->layers[this->N-1].eps;
+        const complex_t eps_=this->layers[m].eps;
+        const complex_t k_N=this->layers[this->N-1].k;
+        const complex_t k_rho_s=k_N*sin(theta_s);
+        TLGF_t TLGF_i, TLGF_v;
+        TLGF_i = configuration_t::TLGF(k_rho_s, z_, dipole_J.r.z, i_source, sheet_I);
+        TLGF_v = configuration_t::TLGF(k_rho_s, z_, dipole_J.r.z, v_source, sheet_I);
+        const complex_t eta_N=this->layers[this->N-1].eta;
+        vector_t<real_t> vector_rho_s, vector_phi_s, vector_z_s;
+        vector_rho_s = vector_t<real_t>(cos(phi_s), sin(phi_s), 0.0);
+        vector_phi_s = vector_t<real_t>(-sin(phi_s), cos(phi_s), 0.0);
+        vector_z_s = vector_t<real_t>(0.0, 0.0, 1.0);
+        const complex_t j=complex_t(0.0, +1.0);
+        vector_t<complex_t> vector_k_rho_s=vector_t<complex_t>(k_rho_s*cos(phi_s), k_rho_s*sin(phi_s), 0.0);
+        vector_t<complex_t> J=vector_t<complex_t>(dipole_J.x, dipole_J.y, dipole_J.z);
+        const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_J.r.x+vector_k_rho_s.y*dipole_J.r.y));
+        vector_t<complex_t> E;
+        fields.E.theta = -j*k_N*(exp(-j*k_N*r)/(2.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+            TLGF_i.V_e*(vector_rho_s*J)-TLGF_v.V_e*eta_N*(eps_N/eps_)*sin(theta_s)*(vector_z_s*J)
+            )*factor;
+        fields.E.phi = -j*k_N*(exp(-j*k_N*r)/(2.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+            +TLGF_i.V_h*cos(theta_s)*(vector_phi_s*J)
+            )*factor;
+        fields.H.theta = -fields.E.phi/eta_N;
+        fields.H.phi = -fields.E.theta/eta_N;
+    }
+    return fields;
+}
+
+far_field_t configuration_t::compute_far_field_M(const real_t r, const real_t theta_s, const real_t phi_s, 
+    const dipole_t dipole_M){
+    side_t side=none;
+    if (cos(theta_s)>+cos_theta_min_horizon){
+        side = top;
+    }
+    if (cos(theta_s)<-cos_theta_min_horizon){
+        side = bottom;
+    }
+    far_field_t fields;
+    if (side==top){
+        const size_t m=configuration_t::find_layer(dipole_M.r.z);
+        const real_t z_=this->layers[0].z_max;
+        const complex_t mu_1=this->layers[0].mu;
+        const complex_t mu_=this->layers[m].mu;
+        const complex_t k_1=this->layers[0].k;
+        const complex_t k_rho_s=k_1*sin(theta_s);
+        TLGF_t TLGF_i, TLGF_v;
+        TLGF_i = configuration_t::TLGF(k_rho_s, z_, dipole_M.r.z, i_source, sheet_I);
+        TLGF_v = configuration_t::TLGF(k_rho_s, z_, dipole_M.r.z, v_source, sheet_I);
+        const complex_t eta_1=this->layers[0].eta;
+        vector_t<real_t> vector_rho_s, vector_phi_s, vector_z_s;
+        vector_rho_s = vector_t<real_t>(cos(phi_s), sin(phi_s), 0.0);
+        vector_phi_s = vector_t<real_t>(-sin(phi_s), cos(phi_s), 0.0);
+        vector_z_s = vector_t<real_t>(0.0, 0.0, 1.0);
+        const complex_t j=complex_t(0.0, +1.0);
+        vector_t<complex_t> vector_k_rho_s=vector_t<complex_t>(k_rho_s*cos(phi_s), k_rho_s*sin(phi_s), 0.0);
+        vector_t<complex_t> M=vector_t<complex_t>(dipole_M.x, dipole_M.y, dipole_M.z);
+        const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_M.r.x+vector_k_rho_s.y*dipole_M.r.y));
+        vector_t<complex_t> E;
+        fields.E.theta = +j*k_1*(exp(-j*k_1*r)/(2.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+            -TLGF_v.V_e*(vector_phi_s*M)
+            )*factor;
+        fields.E.phi = +j*k_1*(exp(-j*k_1*r)/(2.0*pi*r))*exp(+j*k_1*cos(theta_s)*z_)*(
+            TLGF_v.V_h*cos(theta_s)*(vector_rho_s*M)-TLGF_i.V_h*(1.0/eta_1)*(mu_1/mu_)*sin(theta_s)*cos(theta_s)*(vector_z_s*M)
+            )*factor;
+        fields.H.theta = -fields.E.phi/eta_1;
+        fields.H.phi = -fields.E.theta/eta_1;
+    }
+    if (side==bottom){
+        const size_t m=configuration_t::find_layer(dipole_M.r.z);
+        const real_t z_=this->layers[this->N-1].z_min;
+        const complex_t mu_N=this->layers[this->N-1].mu;
+        const complex_t mu_=this->layers[m].mu;
+        const complex_t k_N=this->layers[this->N-1].k;
+        const complex_t k_rho_s=k_N*sin(theta_s);
+        TLGF_t TLGF_i, TLGF_v;
+        TLGF_i = configuration_t::TLGF(k_rho_s, z_, dipole_M.r.z, i_source, sheet_I);
+        TLGF_v = configuration_t::TLGF(k_rho_s, z_, dipole_M.r.z, v_source, sheet_I);
+        const complex_t eta_N=this->layers[this->N-1].eta;
+        vector_t<real_t> vector_rho_s, vector_phi_s, vector_z_s;
+        vector_rho_s = vector_t<real_t>(cos(phi_s), sin(phi_s), 0.0);
+        vector_phi_s = vector_t<real_t>(-sin(phi_s), cos(phi_s), 0.0);
+        vector_z_s = vector_t<real_t>(0.0, 0.0, 1.0);
+        const complex_t j=complex_t(0.0, +1.0);
+        vector_t<complex_t> vector_k_rho_s=vector_t<complex_t>(k_rho_s*cos(phi_s), k_rho_s*sin(phi_s), 0.0);
+        vector_t<complex_t> M=vector_t<complex_t>(dipole_M.x, dipole_M.y, dipole_M.z);
+        const complex_t factor=exp(+j*(vector_k_rho_s.x*dipole_M.r.x+vector_k_rho_s.y*dipole_M.r.y));
+        vector_t<complex_t> E;
+        fields.E.theta = +j*k_N*(exp(-j*k_N*r)/(2.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+            -TLGF_v.V_e*(vector_phi_s*M)
+            )*factor;
+        fields.E.phi = +j*k_N*(exp(-j*k_N*r)/(2.0*pi*r))*exp(+j*k_N*cos(theta_s)*z_)*(
+            TLGF_v.V_h*cos(theta_s)*(vector_rho_s*M)-TLGF_i.V_h*(1.0/eta_N)*(mu_N/mu_)*sin(theta_s)*cos(theta_s)*(vector_z_s*M)
+            )*factor;
+        fields.H.theta = -fields.E.phi/eta_N;
+        fields.H.phi = -fields.E.theta/eta_N;
+    }
+    return fields;
+}

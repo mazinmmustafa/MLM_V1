@@ -680,8 +680,8 @@ void test_Gold_Kretschmann_reflection(){
 
     range_t theta_i;
 
-    const real_t theta_i_min=deg_to_rad(+0.0);
-    const real_t theta_i_max=deg_to_rad(+180.0);
+    const real_t theta_i_min=+0.0*pi/180.0;
+    const real_t theta_i_max=+180.0*pi/180.0;
     theta_i.set(theta_i_min, theta_i_max, Ns);
     theta_i.linspace();
 
@@ -692,7 +692,10 @@ void test_Gold_Kretschmann_reflection(){
     timer.set();
     for (size_t i=0; i<Ns; i++){
         progress_bar(i, Ns, "computing reflection coefficients...");
-        Gamma_t Gamma=config.compute_Gamma(theta_i(i), sheet_I);
+        const complex_t k_rho_i=abs(theta_i(i))<=pi ? 
+            config.layers[0].k*sin(theta_i(i)) : config.layers[config.N-1].k*sin(theta_i(i));
+        const size_t n=abs(theta_i(i))<=pi ? 0 : (config.N-1);
+        Gamma_t Gamma=config.refl_d(k_rho_i, n, sheet_I);
         file.write("%21.14E %21.14E %21.14E\n", theta_i(i)*180.0/pi, 
             pow(abs(Gamma.Gamma_e), 2.0), pow(abs(Gamma.Gamma_h), 2.0));
     }
@@ -719,8 +722,8 @@ void test_planar_wave_Gold_Kretschmann_near_field(){
     config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.753-j*1.2596);
     config.add_layer(n++, -2500.0*units::nm, -50.0*units::nm, 1.0, 1.0);
 
-    const real_t theta_i=deg_to_rad(+43.7);
-    const real_t phi_i=deg_to_rad(+180.0);
+    const real_t theta_i=+43.7*pi/180.0;
+    const real_t phi_i=+180.0*pi/180.0;
     incident_plane_wave_field_E_0_t E_0;
     E_0.TM = 1.0;
     E_0.TE = 0.0;
@@ -771,177 +774,3 @@ void test_planar_wave_Gold_Kretschmann_near_field(){
     config.unset();
 
 }
-
-
-void test_plasmonic_WG_far_field(){
-
-    const size_t N_layers=19;
-    configuration_t config;
-
-    const real_t lambda_0=633.0*units::nm;
-    const real_t freq=c_0/lambda_0;
-
-    const complex_t j=complex_t(0.0, +1.0);
-    config.set(N_layers, freq);
-    size_t n=0;
-    config.add_layer(n++, +1523.0*units::nm, +2500.0*units::nm, 1.0, 2.3013);
-    config.add_layer(n++, +1445.0*units::nm, +1523.0*units::nm, 1.0, 4.5967);
-    config.add_layer(n++, +1329.0*units::nm, +1445.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +1241.0*units::nm, +1329.0*units::nm, 1.0, 4.5967);
-    config.add_layer(n++, +1115.0*units::nm, +1241.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +1037.0*units::nm, +1115.0*units::nm, 1.0, 4.5967);
-    config.add_layer(n++, +0911.0*units::nm, +1037.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +0833.0*units::nm, +0911.0*units::nm, 1.0, 4.5967);
-    config.add_layer(n++, +0707.0*units::nm, +0833.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +0629.0*units::nm, +0707.0*units::nm, 1.0, 4.5967);
-    config.add_layer(n++, +0503.0*units::nm, +0629.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +0425.0*units::nm, +0503.0*units::nm, 1.0, 4.5967);
-    config.add_layer(n++, +0299.0*units::nm, +0425.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +0221.0*units::nm, +0299.0*units::nm, 1.0, 4.5967);
-    config.add_layer(n++, +0069.0*units::nm, +0221.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +0042.0*units::nm, +0069.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, +0000.0*units::nm, +0042.0*units::nm, 1.0, -18.3511-j*0.4331);
-    config.add_layer(n++, -0027.0*units::nm, +0000.0*units::nm, 1.0, 2.1229);
-    config.add_layer(n++, -0500.0*units::nm, -0027.0*units::nm, 1.0, 1.0);
-
-    const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, -15.0*units::nm);
-    const real_t theta_0=deg_to_rad(+135.0);
-    const real_t phi_0=deg_to_rad(+0.0);
-    const complex_t Il=+1.0;
-    dipole_t J=dipole_t(r_, theta_0, phi_0, Il);
-
-    real_t phi_s;
-
-    config.log();
-
-    //
-    const size_t Ns=4001;
-
-    range_t theta_s;
-
-    const real_t theta_s_min=deg_to_rad(-180.0);
-    const real_t theta_s_max=deg_to_rad(+180.0);
-    theta_s.set(theta_s_min, theta_s_max, Ns);
-    theta_s.linspace();
-
-
-    file_t file;
-    file.open("data/plasmonicWG/data_far_field.txt", 'w');
-    stopwatch_t timer;
-    timer.set();
-    for (size_t i=0; i<Ns; i++){
-        progress_bar(i, Ns, "computing far fields...");
-        const real_t r=1000.0*lambda_0;
-        file.write("%21.14E ", theta_s(i));
-        far_field_t field;
-        phi_s = deg_to_rad(0.0);
-        field = config.compute_far_field_J(r, theta_s(i), phi_s, J);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.theta)));
-        phi_s = deg_to_rad(90.0);
-        field = config.compute_far_field_J(r, theta_s(i), phi_s, J);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.theta)));
-        file.write("\n");
-    }
-    timer.unset();
-    file.close();
-
-    theta_s.unset();
-    config.unset();
-
-}
-
-void test_Chew_far_field(){
-
-    const size_t N_layers=7;
-    configuration_t config;
-
-    const real_t lambda_0=1.0*units::m;
-    const real_t freq=c_0/lambda_0;
-
-    config.set(N_layers, freq);
-    size_t n=0;
-    config.add_layer(n++, +0.0*units::m, +10.0*units::m, 1.0, 1.0);
-    config.add_layer(n++, -0.2*units::m, +0.0*units::m, 1.0, 2.6);
-    config.add_layer(n++, -0.5*units::m, -0.2*units::m, 3.2, 6.5);
-    config.add_layer(n++, -1.0*units::m, -0.5*units::m, 6.0, 4.2);
-    config.add_layer(n++, -1.3*units::m, -1.0*units::m, 3.2, 6.5);
-    config.add_layer(n++, -1.5*units::m, -1.3*units::m, 1.0, 2.6);
-    config.add_layer(n++, -10.0*units::m, -1.5*units::m, 1.0, 1.0);
-
-    const position_t r_=cartesian_t(0.0*units::m, 0.0*units::m, -1.4*units::m);
-    const real_t theta_0=+20.0*pi/180.0;
-    const real_t phi_0=+30.0*pi/180.0;
-    const complex_t Il=+1.0;
-    const complex_t Kl=+1.0;
-    dipole_t J=dipole_t(r_, theta_0, phi_0, Il);
-    dipole_t M=dipole_t(r_, theta_0, phi_0, Kl);
-
-    real_t phi_s;
-
-    config.log();
-
-    //
-    const size_t Ns=4001;
-
-    range_t theta_s;
-
-    const real_t theta_s_min=deg_to_rad(-180.0);
-    const real_t theta_s_max=deg_to_rad(+180.0);
-    theta_s.set(theta_s_min, theta_s_max, Ns);
-    theta_s.linspace();
-
-
-    file_t file;
-    stopwatch_t timer;
-    timer.set();
-    file.open("data/Chew/data_far_field_J.txt", 'w');
-    for (size_t i=0; i<Ns; i++){
-        progress_bar(i, Ns, "computing far fields for J...");
-        const real_t r=1000.0*lambda_0;
-        file.write("%21.14E ", theta_s(i));
-        far_field_t field;
-        phi_s = deg_to_rad(0.0);
-        field = config.compute_far_field_J(r, theta_s(i), phi_s, J);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.theta)));
-        phi_s = deg_to_rad(90.0);
-        field = config.compute_far_field_J(r, theta_s(i), phi_s, J);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.theta)));
-        phi_s = deg_to_rad(0.0);
-        field = config.compute_far_field_J(r, theta_s(i), phi_s, J);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.phi)));
-        phi_s = deg_to_rad(90.0);
-        field = config.compute_far_field_J(r, theta_s(i), phi_s, J);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.phi)));
-        file.write("\n");
-    }
-    file.close();
-
-    file.open("data/Chew/data_far_field_M.txt", 'w');
-    for (size_t i=0; i<Ns; i++){
-        progress_bar(i, Ns, "computing far fields for M...");
-        const real_t r=1.0*lambda_0;
-        file.write("%21.14E ", theta_s(i));
-        far_field_t field;
-        phi_s = deg_to_rad(0.0);
-        field = config.compute_far_field_M(r, theta_s(i), phi_s, M);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.theta)));
-        phi_s = deg_to_rad(90.0);
-        field = config.compute_far_field_M(r, theta_s(i), phi_s, M);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.theta)));
-        phi_s = deg_to_rad(0.0);
-        field = config.compute_far_field_M(r, theta_s(i), phi_s, M);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.phi)));
-        phi_s = deg_to_rad(90.0);
-        field = config.compute_far_field_M(r, theta_s(i), phi_s, M);
-        file.write("%21.14E ", 20.0*log10(abs(field.E.phi)));
-        file.write("\n");
-    }
-    file.close();
-
-    timer.unset();
-
-    theta_s.unset();
-    config.unset();
-
-}
-

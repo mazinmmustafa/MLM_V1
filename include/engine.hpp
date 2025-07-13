@@ -120,6 +120,14 @@ struct near_field_plane_wave_t{
     near_field_t E, H;
 };
 
+struct far_field_components_t{
+    complex_t theta=0.0, phi=0.0;
+};
+
+struct far_field_t{
+    far_field_components_t E, H;
+};
+
 class configuration_t{
     private:
         
@@ -204,6 +212,12 @@ class configuration_t{
         // plane wave
         near_field_plane_wave_t compute_plane_wave(const position_t r, const real_t theta_i, const real_t phi_i, 
             const incident_plane_wave_field_E_0_t E_0);
+        Gamma_t compute_Gamma(const real_t theta_i, const sheet_t sheet);
+        // far field
+        far_field_t compute_far_field_J(const real_t r, const real_t theta_s, const real_t phi_s, 
+            const dipole_t dipole_J);
+        far_field_t compute_far_field_M(const real_t r, const real_t theta_s, const real_t phi_s, 
+            const dipole_t dipole_M);
 };
 
 // Functions
