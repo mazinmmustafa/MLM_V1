@@ -1,6 +1,8 @@
 //
 #include "modal_analysis.hpp"
 
+extern "C" void n_eigen(double *_a, int n, double *wr, double *wi);
+
 complex_t function_derivative(complex_t func(const complex_t, void*), const complex_t z, void *args){
     const real_t h=1.0E-6;
     const complex_t u_x=(real(func(z+h/2.0, args))-real(func(z-h/2.0, args)))/h;    
@@ -8,14 +10,6 @@ complex_t function_derivative(complex_t func(const complex_t, void*), const comp
     const complex_t j=complex_t(0.0, +1.0);
     return u_x+j*v_x;
 }
-
-// complex_t get_mu_k_integrand(const complex_t z, void *args_){
-//     function_args_t *args=(function_args_t*)args_;
-//     const complex_t z=args->z;
-//     const real_t k=args->k;
-//     const complex_t j=complex_t(0.0, +1.0);
-//     return (function_derivative(args->func, z, args)/args->func(z, args))/(2.0*pi*j);
-// }
 
 complex_t mu_k_integrand_1(const complex_t z, void *args_){
     function_args_t *args=(function_args_t*)args_;

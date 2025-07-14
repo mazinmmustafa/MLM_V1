@@ -26,5 +26,5 @@ struct function_args_t{
 complex_t function_derivative(complex_t func(const complex_t, void*), const complex_t z, void *args);
 complex_t compute_mu_k(complex_t func(const complex_t, void*), void *args_, 
     contour_t contour, const real_t k, quadl_t quadl);
-    
+
 #endif
