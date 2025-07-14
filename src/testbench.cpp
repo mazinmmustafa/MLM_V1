@@ -1095,8 +1095,6 @@ complex_t func_modal(const complex_t z, void *args_){
     return z*z*(z-2.0)*(z-2.0)*(exp(2.*z)*cos(z)+z*z*z-1.0-sin(z)) + args->dummy;
 }
 
-// extern "C" void n_eigen(double *_a, int n, double *wr, double *wi);
-
 void test_modal_analysis(){
 
     configuration_t config;
@@ -1114,26 +1112,66 @@ void test_modal_analysis(){
     quadl_t quadl;
     const size_t N_quadl=32;
     const size_t k_max=15;
-    const real_t tol=1.0E-4;
+    const real_t tol=1.0E-6;
     quadl.set(N_quadl, k_max, tol);
 
     complex_t mu_k;
 
     mu_k = compute_mu_k(func_modal, &args, contour, k, quadl);
-    print(mu_k);
+    // print(mu_k);
+
+    // const size_t N=4;
+    // real_t C[N]={+1.0, -2.0, +3.0, -1.0};
+    // complex_t *roots=(complex_t*)calloc(N, sizeof(complex_t));
+    // find_polynomial_roots(N, C, roots);
+    // for (size_t i=0; i<N; i++){
+    //     print(roots[i]);
+    // }
+    // free(roots);
+
+    #define N_MAX 10
+    complex_t *zeros=(complex_t*)calloc(N_MAX, sizeof(complex_t));
+    evaluate_Delves_Lyness(func_modal, &args, contour, quadl, zeros);
+    for (size_t i=0; i<N_MAX; i++){
+        print(zeros[i]);
+    }
+    print("\n");
+    for (size_t i=0; i<N_MAX; i++){
+        complex_t zr=zeros[i];
+        const real_t h=0.1;
+        const real_t eps=1.0E-12;
+        const size_t maxit=100;
+        polish_Muller_methed(func_modal, &args, zr, h, eps, maxit);
+        print(zr);
+    }
+
+    free(zeros);
 
     quadl.unset();
+}
 
 
-    const size_t N=4;
-    real_t C[N]={+1.0, -2.0, +3.0, -1.0};
-    complex_t *roots=(complex_t*)calloc(N, sizeof(complex_t));
-    find_polynomial_roots(N, C, roots);
-    for (size_t i=0; i<N; i++){
-        print(roots[i]);
-    }
-    free(roots);
+void test_CIM(){
 
-    
+    configuration_t config;
+    function_args_t args;
+
+    args.func = func_modal;
+    args.args = null;
+
+    quadl_t quadl;
+    const size_t N_quadl=32;
+    const size_t k_max=15;
+    const real_t tol=1.0E-6;
+    quadl.set(N_quadl, k_max, tol);
+
+    contour_t contour={-3.0, -3.0, +3.0, +3.0};
+    CIM_t CIM(contour, quadl);
+    CIM.compute_zeros(func_modal, &args, contour);
+    CIM.display();
+
+    CIM.clear();
+
+    quadl.unset();
     
 }

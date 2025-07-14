@@ -71,7 +71,7 @@ complex_t compute_mu_k(complex_t func(const complex_t, void*), void *args_,
     return I_1+I_2+I_3+I_4;
 }
 
-void find_polynomial_roots(const size_t N, const real_t C[], complex_t *roots){
+void find_polynomial_roots(const size_t N, const real_t *C, complex_t *roots){
     real_t *a=(real_t*)calloc(N*N, sizeof(real_t));
     real_t *wr=(real_t*)calloc(N, sizeof(real_t));
     real_t *wi=(real_t*)calloc(N, sizeof(real_t));
@@ -90,15 +90,6 @@ void find_polynomial_roots(const size_t N, const real_t C[], complex_t *roots){
             counter++;
         }
     }
-    
-    counter = 0;
-    for (size_t i=0; i<N; i++){
-        for (size_t j=0; j<N; j++){
-            print("%11.4EE ", a[counter]);
-            counter++;
-        }
-        print("\n");
-    }
     n_eigen(a, N, wr, wi);
     const complex_t j=complex_t(0.0, +1.0);
     for (size_t i=0; i<N; i++){
@@ -107,4 +98,122 @@ void find_polynomial_roots(const size_t N, const real_t C[], complex_t *roots){
     free(a);
     free(wr);
     free(wi);
+}
+
+#define __min_tol 1.0E-2
+
+void evaluate_Delves_Lyness(complex_t func(const complex_t, void*), void *args, 
+    contour_t contour, quadl_t quadl, complex_t *zeros){
+    complex_t N_estimate=compute_mu_k(func, args, contour, 0.0, quadl);
+    if (abs(imag(N_estimate))<__min_tol && real(N_estimate)>=0.0){
+        const size_t N=real(N_estimate);
+        real_t *mu_k=(real_t*)calloc(N+1, sizeof(real_t));
+        for (size_t k=0; k<=N; k++){
+            mu_k[k] = real(compute_mu_k(func, args, contour, k, quadl));
+        }
+        real_t *sigma=(real_t*)calloc(N+1, sizeof(real_t));
+        sigma[0] = 1.0;
+        for (size_t k=1; k<=N; k++){
+            real_t sum=0.0;
+            for (size_t j=1; j<=(k-1); j++){
+                sum = sum+sigma[k-j]*mu_k[j];
+            }
+            sigma[k] = (-1.0/k)*(mu_k[k]+sum);
+        }
+        real_t *C=(real_t*)calloc(N, sizeof(real_t));
+        for (size_t i=0; i<N; i++){
+            C[N-i-1] = sigma[i+1];
+        }
+        find_polynomial_roots(N, C, zeros);
+        free(mu_k);
+        free(sigma);
+        free(C);
+    }
+}
+
+void polish_Muller_methed(complex_t func(const complex_t, void*), void *args, 
+    complex_t &xr, const real_t h, const real_t eps, const size_t maxit){
+    complex_t x2=xr;
+    complex_t x1=xr+h*xr;
+    complex_t x0=xr-h*xr; 
+    for (size_t iter=0; iter<maxit; iter++){
+        complex_t h0=x1-x0;
+        complex_t h1=x2-x1;
+        complex_t d0=(func(x1, args)-func(x0, args))/h0;
+        complex_t d1=(func(x2, args)-func(x1, args))/h1;
+        complex_t a=(d1-d0)/(h1+h0);
+        complex_t b=a*h1+d1;
+        complex_t c=func(x2, args);
+        complex_t rad=sqrt(b*b-4.0*a*c);
+        complex_t den;
+        if (abs(b+rad)>abs(b-rad)){
+            den = b+rad;
+        }else{
+            den = b-rad;
+        }
+        complex_t dxr=-2.0*c/den;
+        xr = x2+dxr;
+        if (abs(dxr)<eps*abs(xr)){
+            return;
+        }else{
+            x0 = x1;
+            x1 = x2;
+            x2 = xr;
+        }
+    }
+}
+
+//
+
+void CIM_t::compute_zeros(complex_t func(const complex_t, void*), void *args, contour_t contour){
+    const size_t trial_max=10;
+    complex_t N_estimate=0.0;
+    size_t is_box_ok=false;
+    if (this->counter==0){
+        contour = this->contour_0;
+    }
+    for (size_t i=0; i<trial_max; i++){
+        N_estimate = compute_mu_k(func, args, contour, 0.0, this->quadl);
+        if (abs(imag(N_estimate))<__min_tol && real(N_estimate)>=0.0){
+            is_box_ok = true;
+            break;
+        }else{
+            contour.x_1 -= __min_tol;
+            contour.x_2 += __min_tol;
+            contour.y_1 -= __min_tol;
+            contour.y_2 += __min_tol;
+        }
+    }
+    assert_error(is_box_ok==true, "unable to find a usable box");
+    const size_t N=real(N_estimate);
+    if (this->counter==0){
+        this->N_zeros = 2*N;
+        this->zeros = (complex_t*)calloc(2*N, sizeof(complex_t));
+    }
+    if (N>this->N_max){
+        const real_t x_m=(contour.x_1+contour.x_2)/2.0;
+        const real_t y_m=(contour.y_1+contour.y_2)/2.0;
+        contour_t new_contour_1={contour.x_1, contour.y_1, x_m, y_m};
+        contour_t new_contour_2={x_m, contour.y_1, contour.x_2, y_m};
+        contour_t new_contour_3={contour.x_1, y_m, x_m, contour.y_2};
+        contour_t new_contour_4={x_m, y_m, contour.x_2, contour.y_2};
+        this->compute_zeros(func, args, new_contour_1);
+        this->compute_zeros(func, args, new_contour_2);
+        this->compute_zeros(func, args, new_contour_3);
+        this->compute_zeros(func, args, new_contour_4);
+    }
+    complex_t *new_zeros=(complex_t*)calloc(N, sizeof(complex_t));
+    evaluate_Delves_Lyness(func, args, contour, this->quadl, new_zeros);
+    for (size_t i=0; i<N; i++){
+        polish_Muller_methed(func, args, new_zeros[i], this->h, this->eps, this->maxit);
+        this->zeros[this->counter] = new_zeros[i];
+        this->counter++;
+    }
+    free(new_zeros);
+}
+
+void CIM_t::display(){
+    for (size_t i=0; i<this->N_zeros; i++){
+        print(this->zeros[i]);
+    }
 }
