@@ -27,5 +27,6 @@ void test_planar_wave_Gold_Kretschmann_near_field();
 void test_plasmonic_WG_far_field();
 void test_Chew_far_field();
 void test_Chew_far_field_2_elements();
+void test_DGFs_Gold_Kretschmann_near_far_fields();
 
 #endif

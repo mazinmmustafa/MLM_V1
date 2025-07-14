@@ -388,7 +388,6 @@ void test_DGFs_Gold_Kretschmann(){
     config.add_layer(n++, +0.0*units::nm, +2000.0*units::nm, 1.0, 2.3013);
     config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.753-j*1.2596);
     config.add_layer(n++, -2000.0*units::nm, -50.0*units::nm, 1.0, 1.0);
-;
 
     const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +20.0*units::nm);
     const real_t theta_0=+0.0*pi/180.0;
@@ -401,12 +400,12 @@ void test_DGFs_Gold_Kretschmann(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=32;
+    const size_t N_quadl=8;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=1001;
+    const size_t Ns=201;
     const size_t Nx=Ns, Nz=Ns;
 
     range_t x, z;
@@ -546,7 +545,7 @@ void test_DGFs_Paulus_near_field(){
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=1001;
+    const size_t Ns=201;
     const size_t Nx=Ns, Nz=Ns;
 
     range_t x, z;
@@ -588,7 +587,6 @@ void test_DGFs_Paulus_near_field(){
 
     x.unset();
     z.unset();
-
 
     quadl.unset();
     config.unset();
@@ -640,7 +638,7 @@ void test_planar_wave_Chew_cut(){
     stopwatch_t timer;
     timer.set();
     for (size_t i=0; i<Ns; i++){
-        // progress_bar(i, Ns, "computing plane wave fields...");
+        progress_bar(i, Ns, "computing plane wave fields...");
         file.write("%21.14E ", z(i));
         position_t r=cartesian_t(x, y, z(i));
         near_field_plane_wave_t fields;
@@ -965,10 +963,10 @@ void test_Chew_far_field_2_elements(){
     config.add_layer(n++, -10.0*units::m, -1.5*units::m, 1.0, 1.0);
 
     const position_t r_1=cartesian_t(+0.5*units::m, 0.0*units::m, -0.6*units::m);
-    const position_t r_2=cartesian_t(-0.5*units::m, 0.0*units::m, -0.8*units::m);
+    const position_t r_2=cartesian_t(-0.5*units::m, 0.0*units::m, -0.6*units::m);
     const complex_t Il=+1.0;
-    dipole_t J_1=dipole_t(r_1, deg_to_rad(+30.0), deg_to_rad(+40.0), Il);
-    dipole_t J_2=dipole_t(r_2, deg_to_rad(+30.0), deg_to_rad(+20.0), Il);
+    dipole_t J_1=dipole_t(r_1, deg_to_rad(+0.0), deg_to_rad(+0.0), Il);
+    dipole_t J_2=dipole_t(r_2, deg_to_rad(+0.0), deg_to_rad(+0.0), Il);
 
     real_t phi_s;
 
@@ -1013,3 +1011,80 @@ void test_Chew_far_field_2_elements(){
 
 }
 
+
+void test_DGFs_Gold_Kretschmann_near_far_fields(){
+
+    const size_t N_layers=3;
+    configuration_t config;
+
+    const real_t lambda_0=633.0*units::nm;
+    const real_t freq=c_0/lambda_0;
+
+    const complex_t j=complex_t(0.0, +1.0);
+    config.set(N_layers, freq);
+    size_t n=0;
+    // Gold Kretschmann
+    config.add_layer(n++, +0.0*units::nm, +2000.0*units::nm, 1.0, 2.3013);
+    config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.753-j*1.2596);
+    config.add_layer(n++, -2000.0*units::nm, -50.0*units::nm, 1.0, 1.0);
+
+    const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +20.0*units::nm);
+    const real_t theta_0=+0.0*pi/180.0;
+    const real_t phi_0=+0.0*pi/180.0;
+    const complex_t Il=+1.0;
+    dipole_t J=dipole_t(r_, theta_0, phi_0, Il);
+    const real_t r=+100.0*lambda_0;
+    
+    config.log();
+
+    //
+    quadl_t quadl;
+    const size_t N_quadl=32;
+    const size_t k_max=15;
+    const real_t tol=1.0E-4;
+    quadl.set(N_quadl, k_max, tol);
+
+    const size_t Ns=1001;
+
+    range_t theta;
+    const real_t theta_min=deg_to_rad(-180.0);
+    const real_t theta_max=deg_to_rad(+180.0);
+    theta.set(theta_min, theta_max, Ns);
+    theta.linspace();
+
+    file_t file_J, file_M;
+    file_J.open("data/GoldKretschmann/data_near_far_J.txt", 'w');
+    file_M.open("data/GoldKretschmann/data_near_far_M.txt", 'w');
+    stopwatch_t timer;
+    timer.set();
+    for (size_t i=0; i<Ns; i++){
+        progress_bar(i, Ns, "computing E fields...");
+        position_t r_position;
+        real_t phi;
+        phi = deg_to_rad(0.0);
+        r_position = cartesian_t(r*sin(theta(i))*cos(phi), 
+            r*sin(theta(i))*sin(phi), r*cos(theta(i)));
+        near_field_t E;
+        E = config.compute_E_J_near_field(r_position, J, quadl);
+        const real_t E_mag_J=sqrt(abs(E.x*E.x)+abs(E.y*E.y)+abs(E.z*E.z));
+        E = config.compute_E_M_near_field(r_position, J, quadl);
+        const real_t E_mag_M=sqrt(abs(E.x*E.x)+abs(E.y*E.y)+abs(E.z*E.z));
+
+        far_field_t fields_J, fields_M;
+        fields_J = config.compute_far_field_J(r, theta(i), phi , J);
+        fields_M = config.compute_far_field_M(r, theta(i), phi , J);
+        const real_t E_mag_J_=sqrt(abs(fields_J.E.theta*fields_J.E.theta)+abs(fields_J.E.phi*fields_J.E.phi));
+        const real_t E_mag_M_=sqrt(abs(fields_M.E.theta*fields_M.E.theta)+abs(fields_M.E.phi*fields_M.E.phi));
+        file_J.write("%21.14E %21.14E %21.14E\n", theta(i), 20.0*log10(E_mag_J), 20.0*log10(E_mag_J_));
+        file_M.write("%21.14E %21.14E %21.14E\n", theta(i), 20.0*log10(E_mag_M), 20.0*log10(E_mag_M_)); 
+    }
+    timer.unset();
+    file_J.close();
+    file_M.close();
+
+    theta.unset();
+
+    quadl.unset();
+    config.unset();
+
+}

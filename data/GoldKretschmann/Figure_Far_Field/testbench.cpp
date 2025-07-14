@@ -541,12 +541,12 @@ void test_DGFs_Paulus_near_field(){
 
     //
     quadl_t quadl;
-    const size_t N_quadl=8;
+    const size_t N_quadl=32;
     const size_t k_max=15;
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=21;
+    const size_t Ns=1001;
     const size_t Nx=Ns, Nz=Ns;
 
     range_t x, z;
