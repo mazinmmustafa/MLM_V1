@@ -1088,3 +1088,37 @@ void test_DGFs_Gold_Kretschmann_near_far_fields(){
     config.unset();
 
 }
+
+
+complex_t func_modal(const complex_t z, void *args_){
+    function_args_t *args=(function_args_t*)args_;
+    return z*z*(z-2.0)*(z-2.0)*(exp(2.*z)*cos(z)+z*z*z-1.0-sin(z)) + args->dummy;
+}
+
+void test_modal_analysis(){
+
+    configuration_t config;
+    function_args_t args;
+    const complex_t j=complex_t(0.0, +1.0);
+    const complex_t z=+1.6-j*3.7;
+    complex_t ans;
+    ans = function_derivative(func_modal, z, &args);
+
+    contour_t contour={-3.0, -3.0, +3.0, +3.0};
+    real_t k=0.0;
+    args.func = func_modal;
+    args.args = null;
+
+    quadl_t quadl;
+    const size_t N_quadl=32;
+    const size_t k_max=15;
+    const real_t tol=1.0E-4;
+    quadl.set(N_quadl, k_max, tol);
+
+    complex_t mu_k;
+
+    mu_k = compute_mu_k(func_modal, &args, contour, k, quadl);
+    print(mu_k);
+
+    quadl.unset();
+}

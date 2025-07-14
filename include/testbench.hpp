@@ -9,6 +9,7 @@
 #include "math_utilities.hpp"
 #include "quadl.hpp"
 #include "engine.hpp"
+#include "modal_analysis.hpp"
 
 // Definitions
 
@@ -28,5 +29,6 @@ void test_plasmonic_WG_far_field();
 void test_Chew_far_field();
 void test_Chew_far_field_2_elements();
 void test_DGFs_Gold_Kretschmann_near_far_fields();
+void test_modal_analysis();
 
 #endif
