@@ -70,3 +70,41 @@ complex_t compute_mu_k(complex_t func(const complex_t, void*), void *args_,
     I_4 = quadl.integral_1d(mu_k_integrand_4, &args, contour.y_1, contour.y_2, flag);
     return I_1+I_2+I_3+I_4;
 }
+
+void find_polynomial_roots(const size_t N, const real_t C[], complex_t *roots){
+    real_t *a=(real_t*)calloc(N*N, sizeof(real_t));
+    real_t *wr=(real_t*)calloc(N, sizeof(real_t));
+    real_t *wi=(real_t*)calloc(N, sizeof(real_t));
+    size_t counter=0;
+    for (size_t i=0; i<(N*N); i++){
+        a[i] = 0.0;
+    }
+    for (size_t i=0; i<N; i++){
+        for (size_t j=0; j<N; j++){
+            if (i-1==j){
+                a[counter] = 1.0;  
+            }
+            if (j==N-1){
+                a[counter] = -C[i]; 
+            }
+            counter++;
+        }
+    }
+    
+    counter = 0;
+    for (size_t i=0; i<N; i++){
+        for (size_t j=0; j<N; j++){
+            print("%11.4EE ", a[counter]);
+            counter++;
+        }
+        print("\n");
+    }
+    n_eigen(a, N, wr, wi);
+    const complex_t j=complex_t(0.0, +1.0);
+    for (size_t i=0; i<N; i++){
+        roots[i] = wr[i]+j*wi[i];
+    }
+    free(a);
+    free(wr);
+    free(wi);
+}

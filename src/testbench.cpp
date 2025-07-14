@@ -1095,7 +1095,7 @@ complex_t func_modal(const complex_t z, void *args_){
     return z*z*(z-2.0)*(z-2.0)*(exp(2.*z)*cos(z)+z*z*z-1.0-sin(z)) + args->dummy;
 }
 
-extern "C" void n_eigen(double *_a, int n, double *wr, double *wi);
+// extern "C" void n_eigen(double *_a, int n, double *wr, double *wi);
 
 void test_modal_analysis(){
 
@@ -1125,21 +1125,15 @@ void test_modal_analysis(){
     quadl.unset();
 
 
-    const size_t NN=3;
-    real_t *a=(real_t*)calloc(NN*NN, sizeof(real_t));
-    real_t *wr=(real_t*)calloc(NN, sizeof(real_t));
-    real_t *wi=(real_t*)calloc(NN, sizeof(real_t));
-    a[0] = +4.0; a[1] = +4.0; a[2] = -1.0;
-    a[3] = -2.0; a[4] = +3.0; a[5] = -3.0;
-    a[6] = +3.0; a[7] = +1.0; a[8] = -2.0;
-
-    n_eigen(a, NN, wr, wi);
-    for (size_t i=0; i <NN; i++){
-        print("%21.14E %21.14E\n", wr[i], wi[i]);
+    const size_t N=4;
+    real_t C[N]={+1.0, -2.0, +3.0, -1.0};
+    complex_t *roots=(complex_t*)calloc(N, sizeof(complex_t));
+    find_polynomial_roots(N, C, roots);
+    for (size_t i=0; i<N; i++){
+        print(roots[i]);
     }
+    free(roots);
 
     
-    free(a);
-    free(wr);
-    free(wi);
+    
 }
