@@ -26,7 +26,8 @@ int main(){
     // test_DGFs_Gold_Kretschmann_near_far_fields();
     // test_modal_analysis();
     // test_CIM();
-    test_CIM_layered_media();
-
+    // test_CIM_layered_media();
+    test_HPM_SNR();
+    
     return 0;
 }

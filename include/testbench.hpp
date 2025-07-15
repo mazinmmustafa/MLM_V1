@@ -32,5 +32,6 @@ void test_DGFs_Gold_Kretschmann_near_far_fields();
 void test_modal_analysis();
 void test_CIM();
 void test_CIM_layered_media();
+void test_HPM_SNR();
 
 #endif

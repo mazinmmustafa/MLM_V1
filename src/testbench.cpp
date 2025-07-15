@@ -1215,3 +1215,127 @@ void test_CIM_layered_media(){
 
     quadl.unset();
 }
+
+
+void test_HPM_SNR(){
+
+    const size_t N_layers=4;
+    configuration_t config;
+
+    const real_t freq=123.0*units::MHz;
+
+    const complex_t eps_phantom=60.0;
+    const complex_t sigma_phantom=0.4;
+    const complex_t eps_HPM=2000.0;
+    const complex_t sigma_HPM=0.01;
+
+    const real_t d_HPM=4.0*units::mm;
+    const real_t g_HPM=10.0*units::mm;
+    const real_t g_dipole=10.0*units::mm;
+
+    const position_t r_=cartesian_t(0.0*units::mm, 0.0*units::mm, g_HPM+d_HPM+g_dipole);
+    dipole_t J=dipole_t(r_, deg_to_rad(+90.0), deg_to_rad(+0.0), 1.0);
+
+    const complex_t j=complex_t(0.0, +1.0);
+    config.set(N_layers, freq);
+    size_t n=0;
+    config.add_layer(n++, g_HPM+d_HPM, +1000.0*units::mm, 1.0, 1.0);
+    config.add_layer(n++, g_HPM, g_HPM+d_HPM, 1.0, eps_HPM-j*sigma_HPM/(2.0*pi*freq*eps_0*eps_HPM));
+    config.add_layer(n++, +0.0*units::mm, g_HPM, 1.0, 1.0);
+    config.add_layer(n++, -1000.0*units::mm, +0.0*units::mm, 1.0, eps_phantom-j*sigma_phantom/(2.0*pi*freq*eps_0*eps_phantom));
+
+    const real_t R_max=100.0*units::mm;
+    const real_t d_xy=2.0*units::mm;
+    const real_t d_z=d_xy;
+    const size_t Ns_xy=1.0+2.*R_max/d_xy;
+    const size_t Ns_z=1.0+(R_max+g_HPM+d_HPM)/d_z;
+    const real_t dV=d_xy*d_xy*d_z;
+
+    range_t x, y, z;
+    x.set(-R_max, +R_max, Ns_xy);
+    y.set(-R_max, +R_max, Ns_xy);
+    z.set(-R_max, g_HPM+d_HPM, Ns_z);
+
+
+    config.log();
+
+    quadl_t quadl;
+    const size_t N_quadl=32;
+    const size_t k_max=15;
+    const real_t tol=1.0E-4;
+    quadl.set(N_quadl, k_max, tol);
+
+    real_t E_mag_squared=0.0;
+    for (size_t ii=0; ii<Ns_xy; ii++){
+        progress_bar(ii, Ns_xy, "computing R matrix...");
+        for (size_t jj=0; jj<Ns_xy; jj++){
+            for (size_t kk=0; kk<Ns_z; kk++){
+                position_t r=cartesian_t(x(ii), y(jj), z(kk));
+                near_field_t E;
+                E = config.compute_E_J_near_field(r, J, quadl);
+                if (z(kk)>=g_HPM && z(kk)<=g_HPM+d_HPM){
+                    E_mag_squared+=real(0.5*sigma_HPM*(pow(abs(E.x), 2.0)+pow(abs(E.y), 2.0)+pow(abs(E.z), 2.0)))*dV;
+                }
+                if (z(kk)<=0.0){
+                    E_mag_squared+=real(0.5*sigma_phantom*(pow(abs(E.x), 2.0)+pow(abs(E.y), 2.0)+pow(abs(E.z), 2.0)))*dV;
+                }
+            }
+        }
+    }
+    
+    real_t R_matrix=E_mag_squared;
+    print(R_matrix);
+
+    //
+
+    // position_t r=cartesian_t(x(ii), y, z(jj));
+    //         near_field_plane_wave_t fields;
+    //         fields = config.compute_plane_wave(r, theta_i, phi_i, E_0);
+    //         const real_t E_mag=sqrt(pow(real(fields.E.x), 2.0)+pow(real(fields.E.y), 2.0)+pow(real(fields.E.z), 2.0));
+    //         const real_t H_mag=sqrt(pow(real(fields.H.x), 2.0)+pow(real(fields.H.y), 2.0)+pow(real(fields.H.z), 2.0));
+    // const size_t Nx=1001, Nz=1001;
+
+    // range_t x, z;
+
+    // const real_t x_min=-1000.0*units::nm;
+    // const real_t x_max=+1000.0*units::nm;
+    // const real_t z_min=-1000.0*units::nm;
+    // const real_t z_max=+1000.0*units::nm;
+    // x.set(x_min, x_max, Nx);
+    // z.set(z_min, z_max, Nz);
+    // x.linspace();
+    // z.linspace();
+
+
+    // file_t file_E, file_H;
+    // file_E.open("data/GoldKretschmann/data_PW_E.txt", 'w');
+    // file_H.open("data/GoldKretschmann/data_PW_H.txt", 'w');
+    // stopwatch_t timer;
+    // timer.set();
+    // for (size_t ii=0; ii<Nx; ii++){
+    //     progress_bar(ii, Nx, "computing plane wave fields...");
+    //     for (size_t jj=0; jj<Nz; jj++){
+    //         position_t r=cartesian_t(x(ii), y, z(jj));
+    //         near_field_plane_wave_t fields;
+    //         fields = config.compute_plane_wave(r, theta_i, phi_i, E_0);
+    //         const real_t E_mag=sqrt(pow(real(fields.E.x), 2.0)+pow(real(fields.E.y), 2.0)+pow(real(fields.E.z), 2.0));
+    //         const real_t H_mag=sqrt(pow(real(fields.H.x), 2.0)+pow(real(fields.H.y), 2.0)+pow(real(fields.H.z), 2.0));
+    //         file_E.write("%21.14E %21.14E %21.14E\n", x(ii)/1E-6, z(jj)/1E-6, E_mag);
+    //         file_H.write("%21.14E %21.14E %21.14E\n", x(ii)/1E-6, z(jj)/1E-6, H_mag/1.0E-3);
+    //     }
+    //     file_E.write("\n");
+    //     file_H.write("\n");
+    // }
+    // timer.unset();
+    // file_E.close();
+
+    quadl.unset();
+
+    x.unset();
+    y.unset();
+    z.unset();
+
+
+    config.unset();
+
+}
