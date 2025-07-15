@@ -165,12 +165,13 @@ void polish_Muller_methed(complex_t func(const complex_t, void*), void *args,
 
 //
 
-void CIM_t::compute_zeros(complex_t func(const complex_t, void*), void *args, contour_t contour){
+void CIM_t::compute_zeros_internal(complex_t func(const complex_t, void*), void *args, contour_t contour){
     const size_t trial_max=10;
     complex_t N_estimate=0.0;
     size_t is_box_ok=false;
     if (this->counter==0){
         contour = this->contour_0;
+        this->counter++;
     }
     for (size_t i=0; i<trial_max; i++){
         N_estimate = compute_mu_k(func, args, contour, 0.0, this->quadl);
@@ -186,10 +187,6 @@ void CIM_t::compute_zeros(complex_t func(const complex_t, void*), void *args, co
     }
     assert_error(is_box_ok==true, "unable to find a usable box");
     const size_t N=real(N_estimate);
-    if (this->counter==0){
-        this->N_zeros = 2*N;
-        this->zeros = (complex_t*)calloc(2*N, sizeof(complex_t));
-    }
     if (N>this->N_max){
         const real_t x_m=(contour.x_1+contour.x_2)/2.0;
         const real_t y_m=(contour.y_1+contour.y_2)/2.0;
@@ -197,19 +194,65 @@ void CIM_t::compute_zeros(complex_t func(const complex_t, void*), void *args, co
         contour_t new_contour_2={x_m, contour.y_1, contour.x_2, y_m};
         contour_t new_contour_3={contour.x_1, y_m, x_m, contour.y_2};
         contour_t new_contour_4={x_m, y_m, contour.x_2, contour.y_2};
-        this->compute_zeros(func, args, new_contour_1);
-        this->compute_zeros(func, args, new_contour_2);
-        this->compute_zeros(func, args, new_contour_3);
-        this->compute_zeros(func, args, new_contour_4);
+        this->compute_zeros_internal(func, args, new_contour_1);
+        this->compute_zeros_internal(func, args, new_contour_2);
+        this->compute_zeros_internal(func, args, new_contour_3);
+        this->compute_zeros_internal(func, args, new_contour_4);
+        
     }
+    this->N_zeros_temp+=N;
     complex_t *new_zeros=(complex_t*)calloc(N, sizeof(complex_t));
     evaluate_Delves_Lyness(func, args, contour, this->quadl, new_zeros);
     for (size_t i=0; i<N; i++){
         polish_Muller_methed(func, args, new_zeros[i], this->h, this->eps, this->maxit);
-        this->zeros[this->counter] = new_zeros[i];
-        this->counter++;
+        this->zeros_temp.push(new_zeros[i]);
     }
     free(new_zeros);
+}
+
+complex_t round_n(const complex_t z, const real_t eps){
+    real_t x=real(z), y=imag(z);
+    const complex_t j=complex_t(0.0, +1.0);
+    const int_t n=log10(eps);
+    const real_t base=pow(10.0, n);
+    x = base*round(x/base);
+    y = base*round(y/base);
+    return x+j*y;
+}
+
+void CIM_t::compute_zeros(complex_t func(const complex_t, void*), void *args, contour_t contour){
+    this->compute_zeros_internal(func, args, contour);
+    struct data_temp_t{
+        complex_t data=0;
+        size_t flag=false;
+    };
+    data_temp_t *data_temp=(data_temp_t*)calloc(this->N_zeros_temp, sizeof(data_temp_t));
+
+    for (size_t i=0; i<this->N_zeros_temp; i++){
+        data_temp[i].data = round_n(this->zeros_temp.top(), this->eps*10.0);
+        this->zeros_temp.pop();
+    }
+    for (size_t i=0; i<this->N_zeros_temp; i++){
+        for (size_t k=i+1; k<this->N_zeros_temp; k++){
+            if (abs(data_temp[i].data-data_temp[k].data)<this->eps){
+                data_temp[k].flag = true;
+            }
+        }
+    }
+    for (size_t i=0; i<this->N_zeros_temp; i++){
+        if (data_temp[i].flag==false){
+            this->zeros_temp.push(data_temp[i].data);
+            this->N_zeros++;
+        }
+    }
+    free(data_temp);
+    this->zeros = (complex_t*)calloc(this->N_zeros, sizeof(complex_t));
+    assert(this->zeros!=null);
+    this->is_allocated = true;
+    for (size_t i=0; i<this->N_zeros; i++){
+        this->zeros[i] = this->zeros_temp.top();
+        this->zeros_temp.pop();
+    }
 }
 
 void CIM_t::display(){

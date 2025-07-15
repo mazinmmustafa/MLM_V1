@@ -8,6 +8,7 @@
 #include "math_utilities.hpp"
 #include "quadl.hpp"
 #include "vector.hpp"
+#include <stack>
 
 // Definitions
 struct contour_t{
@@ -20,6 +21,9 @@ class CIM_t{
         const real_t eps=1.0E-12;
         const size_t maxit=100;
         size_t counter=0;
+        std::stack<complex_t> zeros_temp;
+        size_t N_zeros_temp=0;
+        size_t is_allocated=false;
     public:
         complex_t *zeros=null;
         size_t N_zeros=0;
@@ -29,7 +33,9 @@ class CIM_t{
         CIM_t(){}
         ~CIM_t(){}
         void clear(){
-            free(this->zeros);
+            if (this->is_allocated==true){
+                free(this->zeros);
+            }
             this->N_zeros = 0;
         }
         CIM_t(const contour_t contour, quadl_t quadl){
@@ -37,6 +43,7 @@ class CIM_t{
             this->quadl = quadl;
         }
         void compute_zeros(complex_t func(const complex_t, void*), void *args, contour_t contour);
+        void compute_zeros_internal(complex_t func(const complex_t, void*), void *args, contour_t contour);
         void display();
 };
 
@@ -58,4 +65,5 @@ void evaluate_Delves_Lyness(complex_t func(const complex_t, void*), void *args,
 void polish_Muller_methed(complex_t func(const complex_t, void*), void *args, 
     complex_t &xr, const real_t h, const real_t eps, const size_t maxit);
 
+complex_t round_n(const complex_t z, const real_t eps);
 #endif

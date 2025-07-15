@@ -242,6 +242,7 @@ void n_eigen(double *_a, int n, double *wr, double *wi)
 	double        **a = (double **) calloc(n, sizeof(void *));
 	for (i = 0; i < n; ++i)
 		a[i] = _a + i * n;
+
 	balanc(a, n);
 	elmhes(a, n);
 	hqr(a, n, wr, wi);
@@ -393,7 +394,7 @@ int n_eigen_symm(double *_a, int n, double *eval)
 {
 	double **a, *e;
 	int i;
-	a = (double**)calloc(n, sizeof(void*));
+	a = (double**)calloc(n, sizeof(double*));
 	e = (double*)calloc(n, sizeof(double));
 	for (i = 0; i < n; ++i) a[i] = _a + i * n;
 	tred2(a, n, eval, e);
@@ -402,56 +403,5 @@ int n_eigen_symm(double *_a, int n, double *eval)
 	return 0;
 }
 
-#ifdef LH3_EIGEN_MAIN
 
-int main(void)
-{
-	int             i, j;
-	static double   u[5], v[5];
-	static double   a[5][5] = {{1.0, 6.0, -3.0, -1.0, 7.0},
-	{8.0, -15.0, 18.0, 5.0, 4.0}, {-2.0, 11.0, 9.0, 15.0, 20.0},
-	{-13.0, 2.0, 21.0, 30.0, -6.0}, {17.0, 22.0, -5.0, 3.0, 6.0}};
-
-	static double b[5][5]={ {10.0,1.0,2.0,3.0,4.0},
-							{1.0,9.0,-1.0,2.0,-3.0},
-							{2.0,-1.0,7.0,3.0,-5.0},
-							{3.0,2.0,3.0,12.0,-1.0},
-							{4.0,-3.0,-5.0,-1.0,15.0}};
-
-
-	printf("MAT H IS:\n");
-	for (i = 0; i <= 4; i++) {
-		for (j = 0; j <= 4; j++)
-			printf("%13.7e ", a[i][j]);
-		printf("\n");
-	}
-	printf("\n");
-	n_eigen(a[0], 5, u, v);
-	for (i = 0; i <= 4; i++)
-		printf("%13.7e +J %13.7e\n", u[i], v[i]);
-	printf("\n");
-
-	printf("\n\n");
-	n_eigen_symm(b[0], 5, u);
-	for (i = 0; i <= 4; i++)
-		printf("%13.7e\n", u[i]);
-	printf("\n");
-	for (i = 0; i <= 4; i++) {
-		for (j = 0; j <= 4; j++)
-			printf("%12.6e ", b[i][j]);
-		printf("\n");
-	}
-	printf("\n");
-	
-	return 0;
-}
-
-/* correct output:
-4.2961008e+01 +J 0.0000000e+00
--6.6171383e-01 +J 0.0000000e+00
--1.5339638e+01 +J -6.7556929e+00
--1.5339638e+01 +J 6.7556929e+00
-1.9379983e+01 +J 0.0000000e+00
-*/
-
-#endif
+// #endif

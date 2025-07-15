@@ -1171,7 +1171,6 @@ void test_CIM(){
     CIM.display();
 
     CIM.clear();
-
     quadl.unset();
     
 }
