@@ -19,7 +19,7 @@ class CIM_t{
     private:
         const real_t h=0.1;
         const real_t eps=1.0E-12;
-        const size_t maxit=100;
+        const size_t maxit=10000;
         size_t counter=0;
         std::stack<complex_t> zeros_temp;
         size_t N_zeros_temp=0;
@@ -42,9 +42,10 @@ class CIM_t{
             this->contour_0 = contour;
             this->quadl = quadl;
         }
-        void compute_zeros(complex_t func(const complex_t, void*), void *args, contour_t contour);
+        void compute_zeros(complex_t func(const complex_t, void*), void *args, 
+            complex_t func_polish(const complex_t, void*), contour_t contour);
         void compute_zeros_internal(complex_t func(const complex_t, void*), void *args, contour_t contour);
-        void display();
+        void disp();
 };
 
 struct function_args_t{

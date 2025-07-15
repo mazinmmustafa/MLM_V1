@@ -1167,10 +1167,51 @@ void test_CIM(){
 
     contour_t contour={-3.0, -3.0, +3.0, +3.0};
     CIM_t CIM(contour, quadl);
-    CIM.compute_zeros(func_modal, &args, contour);
-    CIM.display();
+    CIM.compute_zeros(func_modal, &args, func_modal, contour);
+    print("\n");
+    CIM.disp();
 
     CIM.clear();
     quadl.unset();
     
+}
+
+void test_CIM_layered_media(){
+
+    const size_t N_layers=5;
+    configuration_t config;
+
+    const real_t lambda_0=1.3*units::um;
+    const real_t freq=c_0/lambda_0;
+
+    const complex_t j=complex_t(0.0, +1.0);
+    config.set(N_layers, freq);
+    size_t n=0;
+    config.add_layer(n++, +0.0*units::um, +0.0*units::um, 1.0, 1.0);
+    config.add_layer(n++, -0.6*units::um, +0.0*units::um, 1.0, pow(3.4-j*0.002, 2));
+    config.add_layer(n++, -1.0*units::um, -0.6*units::um, 1.0, pow(3.6+j*0.010, 2));
+    config.add_layer(n++, -1.6*units::um, -1.0*units::um, 1.0, pow(3.4-j*0.002, 2));
+    config.add_layer(n++, -1.6*units::um, -1.6*units::um, 1.0, 1.0);
+
+    config.log();
+
+    termination_t top=INF, bottom=INF;
+    polarization_t pol=e;
+    modal_args_t args={top, bottom, pol, sheet_I, config};
+    print(dispersion_function_on_sheet(1.0+j*0.01, &args));
+    print("\n");
+    // exit(0);
+
+    quadl_t quadl;
+    const size_t N_quadl=32;
+    const size_t k_max=15;
+    const real_t tol=1.0E-6;
+    quadl.set(N_quadl, k_max, tol);
+
+    contour_t contour={+0.5, -+0.0, 4.0, +0.1};
+    CIM_t CIM(contour, quadl);
+    CIM.compute_zeros(dispersion_function_all_sheets, &args, dispersion_function_on_sheet, contour);
+    CIM.disp();
+
+    quadl.unset();
 }

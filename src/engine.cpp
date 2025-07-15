@@ -504,19 +504,18 @@ complex_t configuration_t::detour(complex_t &k_rho, const real_t rho, const real
     k_rho = k_0*k_rho;
     const complex_t j=complex_t(0.0, 1.0);
     const real_t a=this->k_0*(1.0+this->k_min);
-    // 
-    // const real_t b=rho>distance ? (this->k_0<1.0/rho ? this->k_0 : 1.0/rho) : this->k_0;
     const real_t b=(0.0*distance) + this->k_0<1.0/rho ? this->k_0 : 1.0/rho;
-    // const real_t b=this->k_0*1.0E-3 + (0.0*rho*distance);
-    // const real_ ratio=1.0+(0.0*distance);
-    // const real_t b=(0.0*distance*rho) + this->k_0;
-    //
-    // const real_t t=real(k_rho);
-    // const real_t x=t;
-    // const real_t y=t<a ? b*sin(pi*t/a) : 0.0;
-    // k_rho = x+j*y;
-    // return 1.0+j*(pi*b/a)*cos(pi*t/a);
-    //
+    /*
+    const real_t b=rho>distance ? (this->k_0<1.0/rho ? this->k_0 : 1.0/rho) : this->k_0;
+    const real_t b=this->k_0*1.0E-3 + (0.0*rho*distance);
+    const real_ ratio=1.0+(0.0*distance);
+    const real_t b=(0.0*distance*rho) + this->k_0;
+    const real_t t=real(k_rho);
+    const real_t x=t;
+    const real_t y=t<a ? b*sin(pi*t/a) : 0.0;
+    k_rho = x+j*y;
+    return 1.0+j*(pi*b/a)*cos(pi*t/a);
+    */
     const real_t t=real(k_rho);
     const real_t x=t;
     const real_t y=(2.0*b/a)*t*exp(1.0-2.0*t/a);
@@ -1727,4 +1726,148 @@ far_field_t configuration_t::compute_far_field_M(const real_t r, const real_t th
         fields.H.phi = +fields.E.theta/eta_N;
     }
     return fields;
+}
+
+//
+
+struct matrix_temp_t{
+    complex_t _11=0.0, _12=0.0;
+    complex_t _21=0.0, _22=0.0;
+};
+
+struct termination_top_t{
+    complex_t A=0.0, B=0.0;
+};
+
+struct termination_bottom_t{
+    complex_t A=0.0, B=0.0;
+};
+
+complex_t dispersion_function_on_sheet(const complex_t k_rho_, void *args_){
+    modal_args_t *args=(modal_args_t*)args_;    
+    const complex_t j=complex_t(0.0, 1.0);
+    configuration_t config=args->config;
+    const complex_t k_rho = config.k_0*k_rho_;
+    const size_t N=config.N;
+    matrix_temp_t T;  
+    complex_t Q_n, Theta;
+    k_rho_paramters_t para_m=config.get_k_rho_parameters(k_rho, 0, args->sheet);
+    k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, 1, args->sheet);
+    if (args->pol==e){
+        Q_n = para_n.Z_e/para_m.Z_e;
+    }
+    if (args->pol==h){
+        Q_n = para_n.Z_h/para_m.Z_h;
+    }
+    Theta = para_n.Theta;
+    T._11 = 0.5*(1.0+Q_n)*exp(+j*Theta);
+    T._12 = 0.5*(1.0-Q_n)*exp(+j*Theta);
+    T._21 = 0.5*(1.0-Q_n)*exp(-j*Theta);
+    T._22 = 0.5*(1.0+Q_n)*exp(-j*Theta);
+    for (size_t i=2; i<N; i++){
+        matrix_temp_t A=T, B;
+        //
+        k_rho_paramters_t para_m=config.get_k_rho_parameters(k_rho, i-1, args->sheet);
+        k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, i, args->sheet);
+        if (args->pol==e){
+            Q_n = para_n.Z_e/para_m.Z_e;
+        }
+        if (args->pol==h){
+            Q_n = para_n.Z_h/para_m.Z_h;
+        }
+        Theta = para_n.Theta;
+        B._11 = 0.5*(1.0+Q_n)*exp(+j*Theta);
+        B._12 = 0.5*(1.0-Q_n)*exp(+j*Theta);
+        B._21 = 0.5*(1.0-Q_n)*exp(-j*Theta);
+        B._22 = 0.5*(1.0+Q_n)*exp(-j*Theta);
+        //
+        T._11 = B._11*A._11+B._12*A._21;
+        T._12 = B._11*A._12+B._12*A._22;
+        T._21 = B._21*A._11+B._22*A._21;
+        T._22 = B._21*A._12+B._22*A._22;
+    }
+    //
+    termination_top_t T_top;
+    termination_bottom_t T_bottom;
+    if (args->term_top==PEC){
+        k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, 0, args->sheet);
+        if (args->pol==e){
+            T_top.A = +para_n.Z_e*exp(+j*para_n.Theta);
+            T_top.B = -para_n.Z_e*exp(-j*para_n.Theta);
+        }
+        if (args->pol==h){
+            T_top.A = +exp(+j*para_n.Theta);
+            T_top.B = -exp(-j*para_n.Theta);
+        }
+    }
+    if (args->term_top==PMC){
+        k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, 0, args->sheet);
+        if (args->pol==e){
+            T_top.A = +para_n.Z_e*exp(+j*para_n.Theta);
+            T_top.B = +para_n.Z_e*exp(-j*para_n.Theta);
+        }
+        if (args->pol==h){
+            T_top.A = +exp(+j*para_n.Theta);
+            T_top.B = +exp(-j*para_n.Theta);
+        }
+    }
+    if (args->term_top==INF){
+        k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, 0, args->sheet);
+        if (args->pol==e){
+            T_top.A = +para_n.Z_e;
+            T_top.B = +0.0;
+        }
+        if (args->pol==h){
+            T_top.A = +1.0;
+            T_top.B = +0.0;
+        }
+    }
+    //
+    if (args->term_bottom==PEC){
+        k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, N-1, args->sheet);
+        if (args->pol==e){
+            T_bottom.A = +1.0;
+            T_bottom.B = +1.0;
+        }
+        if (args->pol==h){
+            T_bottom.A = +1.0/para_n.Z_h;
+            T_bottom.B = +1.0/para_n.Z_h;
+        }
+    }
+    if (args->term_bottom==PMC){
+        k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, N-1, args->sheet);
+        if (args->pol==e){
+            T_bottom.A = +1.0;
+            T_bottom.B = -1.0;
+        }
+        if (args->pol==h){
+            T_bottom.A = +1.0/para_n.Z_h;
+            T_bottom.B = -1.0/para_n.Z_h;
+        }
+    }
+    if (args->term_bottom==INF){
+        k_rho_paramters_t para_n=config.get_k_rho_parameters(k_rho, N-1, args->sheet);
+        if (args->pol==e){
+            T_bottom.A = +1.0;
+            T_bottom.B = +0.0;
+        }
+        if (args->pol==h){
+            T_bottom.A = +1.0/para_n.Z_h;
+            T_bottom.B = +0.0;
+        }
+    }
+    //
+    complex_t AA, BB;
+    AA = T_bottom.A*T._11+T_bottom.B*T._21;
+    BB = T_bottom.A*T._12+T_bottom.B*T._22;
+    return AA*T_top.A+BB*T_top.B;
+}
+
+complex_t dispersion_function_all_sheets(const complex_t k_rho, void *args_){
+    modal_args_t *args=(modal_args_t*)args_;    
+    args->sheet = sheet_I  ; complex_t I_1=dispersion_function_on_sheet(k_rho, args);
+    args->sheet = sheet_II ; complex_t I_2=dispersion_function_on_sheet(k_rho, args);
+    args->sheet = sheet_III; complex_t I_3=dispersion_function_on_sheet(k_rho, args);
+    args->sheet = sheet_IV ; complex_t I_4=dispersion_function_on_sheet(k_rho, args);
+    return I_1*I_2*I_3*I_4;
 }

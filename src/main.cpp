@@ -25,7 +25,8 @@ int main(){
     // test_Chew_far_field_2_elements();
     // test_DGFs_Gold_Kretschmann_near_far_fields();
     // test_modal_analysis();
-    test_CIM();
+    // test_CIM();
+    test_CIM_layered_media();
 
     return 0;
 }

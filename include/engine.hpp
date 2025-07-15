@@ -128,6 +128,11 @@ struct far_field_t{
     far_field_components_t E, H;
 };
 
+enum termination_t{PEC, PMC, INF};
+
+enum polarization_t{e, h};
+
+
 class configuration_t{
     private:
         
@@ -218,9 +223,21 @@ class configuration_t{
             const dipole_t dipole_J);
         far_field_t compute_far_field_M(const real_t r, const real_t theta_s, const real_t phi_s, 
             const dipole_t dipole_M);
+        // modal analysis
+};
+
+struct modal_args_t{
+    termination_t term_top, term_bottom;
+    polarization_t pol;
+    sheet_t sheet;
+    configuration_t config;
 };
 
 // Functions
 complex_t sqrt_m(const complex_t z, const sheet_t sheet);
+
+
+complex_t dispersion_function_on_sheet(const complex_t k_rho, void *args_);
+complex_t dispersion_function_all_sheets(const complex_t k_rho, void *args_);
 
 #endif
