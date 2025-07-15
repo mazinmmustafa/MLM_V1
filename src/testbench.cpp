@@ -1208,7 +1208,7 @@ void test_CIM_layered_media(){
     const real_t tol=1.0E-6;
     quadl.set(N_quadl, k_max, tol);
 
-    contour_t contour={+0.5, -+0.0, 4.0, +0.1};
+    contour_t contour={+0.8, -0.1, 4.0, +0.1};
     CIM_t CIM(contour, quadl);
     CIM.compute_zeros(dispersion_function_all_sheets, &args, dispersion_function_on_sheet, contour);
     CIM.disp();
