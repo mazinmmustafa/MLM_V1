@@ -385,9 +385,9 @@ void test_DGFs_Gold_Kretschmann(){
     // config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.67-j*1.35);
     // config.add_layer(n++, -2000.0*units::nm, -50.0*units::nm, 1.0, 1.0);
     // Gold Kretschmann
-    config.add_layer(n++, +0.0*units::nm, +2000.0*units::nm, 1.0, 2.3013);
+    config.add_layer(n++, +0.0*units::nm, +4000.0*units::nm, 1.0, 2.3013);
     config.add_layer(n++, -50.0*units::nm, +0.0*units::nm, 1.0, -11.753-j*1.2596);
-    config.add_layer(n++, -2000.0*units::nm, -50.0*units::nm, 1.0, 1.0);
+    config.add_layer(n++, -4000.0*units::nm, -50.0*units::nm, 1.0, 1.0);
 
     const position_t r_=cartesian_t(0.0*units::nm, 0.0*units::nm, +20.0*units::nm);
     const real_t theta_0=+0.0*pi/180.0;
@@ -405,14 +405,14 @@ void test_DGFs_Gold_Kretschmann(){
     const real_t tol=1.0E-4;
     quadl.set(N_quadl, k_max, tol);
 
-    const size_t Ns=201;
+    const size_t Ns=401;
     const size_t Nx=Ns, Nz=Ns;
 
     range_t x, z;
-    const real_t x_min=-2000.0*units::nm;
-    const real_t x_max=+2000.0*units::nm;
-    const real_t z_min=-2000.0*units::nm;
-    const real_t z_max=+2000.0*units::nm;
+    const real_t x_min=-4000.0*units::nm;
+    const real_t x_max=+4000.0*units::nm;
+    const real_t z_min=-4000.0*units::nm;
+    const real_t z_max=+4000.0*units::nm;
     x.set(x_min, x_max, Nx);
     z.set(z_min, z_max, Nz);
     x.linspace();

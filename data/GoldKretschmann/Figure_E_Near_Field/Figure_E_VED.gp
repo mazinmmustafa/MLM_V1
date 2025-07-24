@@ -24,8 +24,8 @@ set palette defined ( 0 '#000090',\
 
 set size ratio 1
 
-set xrange [-2:+2]
-set yrange [-2:+2]
+set xrange [-4:+4]
+set yrange [-4:+4]
 
 set cbrange [+200:+320]
 
@@ -34,8 +34,8 @@ set ytics 1
 set cbtics 20
 set tics front
 
-set arrow front from -2, 0 to +2, 0 nohead linestyle 1 lc 'black' lw 2
-set arrow front from -2, -0.05to +2, -0.05 nohead linestyle 1 lc 'black' lw 2
+set arrow front from -4, 0 to +4, 0 nohead linestyle 1 lc 'black' lw 2
+set arrow front from -4, -0.05to +4, -0.05 nohead linestyle 1 lc 'black' lw 2
 
 set xlabel '$x$ [$\mu$m]'
 set ylabel '$z$ [$\mu$m]'
