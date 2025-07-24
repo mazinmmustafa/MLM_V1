@@ -507,8 +507,8 @@ complex_t configuration_t::detour(complex_t &k_rho, const real_t rho, const real
     k_rho = k_0*k_rho;
     const complex_t j=complex_t(0.0, 1.0);
     const real_t a=this->k_0*(1.0+this->k_min);
-    const real_t b=(0.0*distance) + this->k_0<1.0/rho ? this->k_0 : 1.0/rho;
-    // const real_t b=(0.0*distance*rho) + 1.0/__lambda_0;
+    // const real_t b=(0.0*distance) + this->k_0<1.0/rho ? this->k_0 : 1.0/rho;
+    const real_t b=(0.0*distance*rho) + 1.0/__lambda_0;
     
     /*
     const real_t b=rho>distance ? (this->k_0<1.0/rho ? this->k_0 : 1.0/rho) : this->k_0;
