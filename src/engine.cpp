@@ -5,6 +5,8 @@ configuration_t::configuration_t(){}
     
 configuration_t::~configuration_t(){}
 
+real_t __lambda_0=0.0;
+
 void configuration_t::set(const size_t N, const real_t freq){
     assert_error(this->is_allocated==false, "configuration is already set");
     assert_error(N>0, "invalid number of layers");
@@ -16,6 +18,7 @@ void configuration_t::set(const size_t N, const real_t freq){
     this->k_0 = 2.0*pi/this->lambda_0;
     this->layers = (layer_t*)calloc(N, sizeof(layer_t));
     this->is_allocated = true;
+    __lambda_0 = this->lambda_0;
 }
 
 void configuration_t::set_boundary_conditions(const complex_t Gamma_u, const complex_t Gamma_d){
@@ -505,6 +508,8 @@ complex_t configuration_t::detour(complex_t &k_rho, const real_t rho, const real
     const complex_t j=complex_t(0.0, 1.0);
     const real_t a=this->k_0*(1.0+this->k_min);
     const real_t b=(0.0*distance) + this->k_0<1.0/rho ? this->k_0 : 1.0/rho;
+    // const real_t b=(0.0*distance*rho) + 1.0/__lambda_0;
+    
     /*
     const real_t b=rho>distance ? (this->k_0<1.0/rho ? this->k_0 : 1.0/rho) : this->k_0;
     const real_t b=this->k_0*1.0E-3 + (0.0*rho*distance);

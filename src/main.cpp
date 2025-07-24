@@ -16,7 +16,7 @@ int main(){
     // test_DGFs_Chew();
     // test_DGFs_Gold_Kretschmann();
     // test_DGFs_Gold_Kretschmann_cut();
-    // test_DGFs_Paulus_near_field();
+    test_DGFs_Paulus_near_field();
     // test_planar_wave_Chew_cut();
     // test_Gold_Kretschmann_reflection();
     // test_planar_wave_Gold_Kretschmann_near_field();
@@ -27,7 +27,7 @@ int main(){
     // test_modal_analysis();
     // test_CIM();
     // test_CIM_layered_media();
-    test_HPM_SNR();
+    // test_HPM_SNR();
     
     return 0;
 }
